@@ -19,6 +19,12 @@ internal static partial class InputParser
         return regex.IsMatch(instruction);
     }
 
+    public static bool IsValidPlateauDims(string dims)
+    {
+        var regex = PlateauSizeRegex();
+        return regex.IsMatch(dims);
+    }
+
     public static bool IsValidPosition(string position)
     {
         var regex = PositionRegex();
@@ -43,6 +49,28 @@ internal static partial class InputParser
 
         return Either<InstructionSet>.From($"{Messages.CommandsNotCarriedOut}:\n{failureMessages}");
     }
+
+    public static Either<PlateauSize> ParsePlateauDims(string dims)
+    {
+        if (dims == String.Empty)
+        {
+            return Either<PlateauSize>.From(Messages.EmptyInput);
+        }
+        else if (!(IsValidPlateauDims(dims)))
+        {
+            return Either<PlateauSize>.From(Messages.InvalidDimensions(dims));
+        }
+
+        var x = dims[0].ToCoordinate();
+        var y = dims[2].ToCoordinate();
+
+        if (x.Value is Success<int> X && y.Value is Success<int> Y)
+        {
+            return Either<PlateauSize>.From(new PlateauSize(X.Result, Y.Result));
+        }
+        return Either<PlateauSize>.From(Messages.InvalidDimensions(dims));
+    }
+
 
     public static Either<Position> ParsePosition(string position)
     {

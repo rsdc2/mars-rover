@@ -27,6 +27,43 @@ internal class InputParserTests
         Assert.That(result.Message == Messages.NoInstruction);
     }
 
+    [TestCase("1 3 ")]
+    [TestCase ("5 7")]
+    [TestCase ("10 5")]
+    public void InvalidPlateauSizeReturnsFailureWithMessage(string sizeString)
+    {
+        // Act
+        var size = InputParser.ParsePlateauDims(sizeString);
+
+        // Assert
+        size.Message.Should().Be(Messages.InvalidDimensions(sizeString));
+    }
+
+
+    public static IEnumerable<TestCaseData> TestPlateauSizes
+    {
+        get
+        {
+            yield return new TestCaseData("1 3", PlateauSize.From(1, 3));
+            yield return new TestCaseData("3 4", PlateauSize.From(3, 4));
+            yield return new TestCaseData("2 3", PlateauSize.From(2, 3));
+        }
+    }
+
+    [TestCaseSource("TestPlateauSizes")]
+    public void ValidPlateauSizeReturnsSuccessWithPlateauSize(
+        string sizeString,
+        PlateauSize expectedPlateauSize
+    )
+    {
+        // Act
+        var sizeResult = (Success<PlateauSize>)InputParser.ParsePlateauDims(sizeString).Value;
+        var size = sizeResult.Result;
+
+        // Assert
+        size.x.Should().Be(expectedPlateauSize.x);
+        size.y.Should().Be(expectedPlateauSize.y);
+    }
     [Test]
     public void InvalidCoordinatesReturnsFailureWithMessage()
     {
