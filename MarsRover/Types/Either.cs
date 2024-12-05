@@ -21,6 +21,20 @@ namespace MarsRover.Types
             Value = failure;
         }
 
+        public static List<Failure> Failures(IEnumerable<Either<T>> results)
+        {
+            List<Failure> failures = [];
+            foreach (var either in results)
+            {
+                if (either.Value is Failure failure)
+                {
+                    failures.Add(failure);
+                }
+            }
+
+            return failures;
+        }
+
         public Either<U> Fmap<U>(Func<T, U> f)
         {
             if (Value is Success<T> success)
@@ -56,25 +70,18 @@ namespace MarsRover.Types
             return new Either<T>(success);
         }
 
+        public string Message
+        {
+            get => Value.Message;
+        }
+
         public static bool Succeeded(IEnumerable<Either<T>> results)
         {
             var succeeded = results.All(item => item.Value is Success<T>);
             return succeeded;
         }
 
-        public static List<Failure> Failures(IEnumerable<Either<T>> results)
-        {
-            List<Failure> failures = [];
-            foreach (var either in results)
-            {
-                if (either.Value is Failure failure)
-                {
-                    failures.Add(failure);
-                }
-            }
 
-            return failures;
-        }
 
         public static Either<List<T>> Unwrap(IEnumerable<Either<T>> results)
         {
