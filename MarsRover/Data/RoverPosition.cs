@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace MarsRover.Data
 {
-    internal record Position(int x, int y, Direction d);
+    internal record RoverPosition(int x, int y, Direction d);
 }

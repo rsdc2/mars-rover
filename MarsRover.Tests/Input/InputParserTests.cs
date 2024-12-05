@@ -97,10 +97,10 @@ internal class InputParserTests
         var positionString = "1 2 N";
 
         // Act
-        var position = (Success<Position>)InputParser.ParsePosition(positionString).Value;
+        var position = (Success<RoverPosition>)InputParser.ParsePosition(positionString).Value;
 
         // Assert
-        Assert.That(position.Result is Position);
+        Assert.That(position.Result is RoverPosition);
     }
 
 

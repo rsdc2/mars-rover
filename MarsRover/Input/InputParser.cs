@@ -72,15 +72,15 @@ internal static partial class InputParser
     }
 
 
-    public static Either<Position> ParsePosition(string position)
+    public static Either<RoverPosition> ParsePosition(string position)
     {
         if (position == String.Empty)
         {
-            return Either<Position>.From(Messages.NoPosition);
+            return Either<RoverPosition>.From(Messages.NoPosition);
         }
         else if (!(IsValidPosition(position))) 
         {
-            return Either<Position>.From(Messages.InvalidPosition(position));
+            return Either<RoverPosition>.From(Messages.InvalidPosition(position));
         }
 
         var x = position[0].ToCoordinate();
@@ -89,9 +89,9 @@ internal static partial class InputParser
 
         if (x.Value is Success<int> X && y.Value is Success<int> Y && direction.Value is Success<Direction> D)
         { 
-            return Either<Position>.From(new Position(X.Result, Y.Result, D.Result));
+            return Either<RoverPosition>.From(new RoverPosition(X.Result, Y.Result, D.Result));
         }
-        return Either<Position>.From(Messages.InvalidPosition(position));
+        return Either<RoverPosition>.From(Messages.InvalidPosition(position));
     }
 
     [GeneratedRegex(@"[LRM]+")]

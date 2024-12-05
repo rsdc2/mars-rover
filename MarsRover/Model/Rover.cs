@@ -9,7 +9,7 @@ namespace MarsRover.Model
 {
     internal class Rover
     {
-        public Position position { get; private set; }
+        public RoverPosition position { get; private set; }
         public Rover() { }  
 
     }
