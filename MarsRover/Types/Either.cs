@@ -10,7 +10,10 @@ namespace MarsRover.Types
     internal class Either<T>
     {
 
-        public ISuccessFailure Value {  get; set; }
+        public ISuccessFailure Value { get; set; }
+        public bool IsFailure { get => Value is Failure; }
+        public bool IsSuccess { get => Value is Success<T>; }
+        public string Message { get => Value.Message; }
 
         public Either(Success<T> success) 
         {
@@ -82,20 +85,6 @@ namespace MarsRover.Types
             return new Either<T>(success);
         }
 
-        public bool IsFailure
-        {
-            get => Value is Failure;
-        }
-
-        public bool IsSuccess
-        {
-            get => Value is Success<T>;
-        }
-
-        public string Message
-        {
-            get => Value.Message;
-        }
 
         public static bool Succeeded(IEnumerable<Either<T>> results)
         {
@@ -118,5 +107,7 @@ namespace MarsRover.Types
             var failure = Either<List<T>>.From(message);
             return failure;
         }
+
+
     }
 }
