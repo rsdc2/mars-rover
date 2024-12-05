@@ -2,6 +2,7 @@
 using MarsRover.Data;
 using MarsRover.Input;
 using MarsRover.Model;
+using MarsRover.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,11 +29,12 @@ namespace MarsRover.Tests.Model
             var rover = new Rover(position);
 
             // Act
-            var newDirection = rover.Rotate(rotation);
+            var newDirection = (Success<Direction>)rover.Rotate(rotation).Value;
 
             // Assert
-            newDirection.Should().Be(finalDirection);
+            newDirection.Result.Should().Be(finalDirection);
         }
+
 
     }
 }
