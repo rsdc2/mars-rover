@@ -50,7 +50,7 @@ internal class InputParserTests
         }
     }
 
-    [TestCaseSource("TestPlateauSizes")]
+    [TestCaseSource(nameof(TestPlateauSizes))]
     public void ValidPlateauSizeReturnsSuccessWithPlateauSize(
         string sizeString,
         PlateauSize expectedPlateauSize
