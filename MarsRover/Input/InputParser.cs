@@ -19,6 +19,12 @@ internal static partial class InputParser
         return regex.IsMatch(instruction);
     }
 
+    public static bool IsValidPosition(string position)
+    {
+        var regex = PositionRegex();
+        return regex.IsMatch(position);
+    }
+
     public static Either<InstructionSet> ParseInstruction(string instructionString)
     {
 
@@ -38,10 +44,27 @@ internal static partial class InputParser
         return Either<InstructionSet>.From($"{Messages.CommandsNotCarriedOut}:\n{failureMessages}");
     }
 
-    //public static Either<Position> ParsePosition(string position)
-    //{
+    public static Either<Position> ParsePosition(string position)
+    {
+        if (position == String.Empty)
+        {
+            return Either<Position>.From(Messages.NoPosition);
+        }
+        else if (!(IsValidPosition(position))) 
+        {
+            return Either<Position>.From(Messages.InvalidPosition(position));
+        }
 
-    //}
+        var x = position[0].ToCoordinate();
+        var y = position[2].ToCoordinate();
+        var direction = position[4].ToDirection();
+
+        if (x.Value is Success<int> X && y.Value is Success<int> Y && direction.Value is Success<Direction> D)
+        { 
+            return Either<Position>.From(new Position(X.Result, Y.Result, D.Result));
+        }
+        return Either<Position>.From(Messages.InvalidPosition(position));
+    }
 
     [GeneratedRegex(@"[LRM]+")]
     private static partial Regex InstructionRegex();

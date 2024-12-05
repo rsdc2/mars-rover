@@ -15,7 +15,7 @@ namespace MarsRover.Tests.Input;
 internal class InputParserTests
 {
     [Test]
-    public void InvalidInputReturnsFailure()
+    public void EmptyInputReturnsFailure()
     {
         // Arrange
         string instruction = "";
@@ -26,6 +26,46 @@ internal class InputParserTests
         // Assert
         Assert.That(result.Message == Messages.NoInstruction);
     }
+
+    [Test]
+    public void InvalidCoordinatesReturnsFailureWithMessage()
+    {
+        // Arrange
+        var positionString = "5 7 N";
+
+        // Act
+        var position = InputParser.ParsePosition(positionString);
+
+        // Assert
+        Assert.That(position.Message == Messages.InvalidPosition(positionString));
+    }
+
+    [Test]
+    public void InvalidDirectionReturnsFailureWithMessage()
+    {
+        // Arrange
+        var positionString = "1 2 L";
+
+        // Act
+        var position = InputParser.ParsePosition(positionString);
+
+        // Assert
+        Assert.That(position.Message == Messages.InvalidPosition(positionString));
+    }
+
+    [Test]
+    public void ValidPositionReturnsSuccessWithPosition()
+    {
+        // Arrange
+        var positionString = "1 2 N";
+
+        // Act
+        var position = (Success<Position>)InputParser.ParsePosition(positionString).Value;
+
+        // Assert
+        Assert.That(position.Result is Position);
+    }
+
 
     [Test]
     public void InvalidInstructionsReturnsMessageWithFailureDescriptions()
