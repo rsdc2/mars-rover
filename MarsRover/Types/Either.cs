@@ -82,6 +82,16 @@ namespace MarsRover.Types
             return new Either<T>(success);
         }
 
+        public bool IsFailure
+        {
+            get => Value is Failure;
+        }
+
+        public bool IsSuccess
+        {
+            get => Value is Success<T>;
+        }
+
         public string Message
         {
             get => Value.Message;
