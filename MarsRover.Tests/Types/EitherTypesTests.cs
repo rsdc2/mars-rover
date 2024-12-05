@@ -134,5 +134,33 @@ public class Tests
         unwrapped.Value.Message.Should().Be("Could not perform calculation\nCould not perform calculation");
     }
 
+    [Test]
+    public void FmapSuccessTest()
+    {
+        // Arrange
+        var either = Either<int>.From(1);
+        Func<int, int> add1 = x => x + 1;
+
+        // Act
+        var result = (Success<int>)either.Fmap(add1).Value;
+
+        // Assert
+        result.Result.Should().Be(2);
+    }
+
+    [Test]
+    public void FmapFailureTest()
+    {
+        // Arrange
+        var either = Either<int>.From("Could not process instruction");
+        Func<int, int> add1 = x => x + 1;
+
+        // Act
+        var result = either.Fmap(add1);
+
+        // Assert
+        Assert.That(result.Value is Failure);
+    }
+
 
 }
