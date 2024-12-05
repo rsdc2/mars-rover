@@ -9,6 +9,7 @@ namespace MarsRover.Types
     internal class Failure : ISuccessFailure
     {
         public string Message { get; set; }
+
         public Failure(string message)
         {
             Message = message;

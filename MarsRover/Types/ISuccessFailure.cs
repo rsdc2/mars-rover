@@ -10,5 +10,6 @@ namespace MarsRover.Types
 
     {
         public string Message { get; set; }
+
     }
 }

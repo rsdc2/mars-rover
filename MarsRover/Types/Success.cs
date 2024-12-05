@@ -8,8 +8,13 @@ namespace MarsRover.Types
 {
     internal class Success<T> : ISuccessFailure
     {
-        public string Message { get; set; }
+        public string Message { get; set; } = string.Empty;
         public T Result { get; private set; }
+
+        public Success(T result)
+        {
+            Result = result;
+        }
 
         public Success(T result, string message) 
         {
