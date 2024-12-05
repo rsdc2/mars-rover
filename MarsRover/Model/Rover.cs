@@ -1,4 +1,5 @@
 ﻿using MarsRover.Data;
+using MarsRover.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,12 +10,14 @@ namespace MarsRover.Model
 {
     internal class Rover
     {
+        public static int Rovers { get; private set; } = 0;
         public RoverPosition Position { get; private set; }
 
+        public int Id { get; private set; }
         public int X { get => Position.X; }
         public int Y { get => Position.Y; }
 
-        public Direction D 
+        public Direction Direction 
         { 
             get => Position.Direction;
             set => Position.Direction = value;
@@ -23,16 +26,18 @@ namespace MarsRover.Model
         public Rover(RoverPosition position) 
         {
             Position = position;
+            Rovers++;
+            Id = Rovers;
         }  
 
-        public Direction Rotate(RotateInstruction rotation)
+        public Either<Direction> Rotate(RotateInstruction rotation)
         {
-            var directionInt = (int)D;
+            var directionInt = (int)Direction;
             var rotationInt = (int)rotation;
 
             var newDirection = (Direction)((4 + directionInt + rotationInt) % 4);
-            D = newDirection;
-            return D;
+            Direction = newDirection;
+            return Either<Direction>.From(Direction);
         }
 
     }
