@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace MarsRover.Data
 {
-    internal enum Direction
+    internal enum MoveInstruction
     {
-        N = 0,
-        E = 1,
-        S = 2,
-        W = 3
+        M
     }
 }

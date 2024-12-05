@@ -8,12 +8,6 @@ namespace MarsRover.Data;
 
 internal static class Messages
 {
-    public static Dictionary<Failures, string> MessagesDict = new()
-    {
-        {Failures.CommandsNotCarriedOut, CommandsNotCarriedOut},
-        {Failures.ParseFailure, ParseFailure}
-    };
-
     public static string CommandsNotCarriedOut = "Commands not carried out";
     public static string EmptyInput = "No input received";
     public static string ParseFailure = "could not be parsed";

@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace MarsRover.Data
 {
-    internal enum Direction
+    internal enum RotateInstruction
     {
-        N = 0,
-        E = 1,
-        S = 2,
-        W = 3
+        R = 1,
+        L = -1
     }
 }
