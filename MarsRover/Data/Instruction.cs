@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MarsRover.Data
+using MarsRover.Types;
+
+namespace MarsRover.Data;
+
+internal enum Instruction
 {
-    internal enum Instruction
-    {
-        L,
-        R,
-        M
-    }
+    L,
+    R,
+    M
 }
+
+
+
