@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,6 +20,17 @@ namespace MarsRover.Types
         public Either(Failure failure)
         {
             Value = failure;
+        }
+
+        public Either<U> Bind<U>(Func<T, Either<U>> f)
+        {
+            if (Value is Success<T> success)
+            {
+                var newValue = f(success.Result);
+                return newValue;
+            }
+
+            return Either<U>.From(Value.Message);
         }
 
         public static List<Failure> Failures(IEnumerable<Either<T>> results)

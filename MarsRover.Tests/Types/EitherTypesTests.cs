@@ -134,7 +134,7 @@ public class Tests
         unwrapped.Value.Message.Should().Be("Could not perform calculation\nCould not perform calculation");
     }
 
-    [Test]
+    [Test, Description("Test that applying a function to an Either returns an Either containing the correct value")]
     public void FmapSuccessTest()
     {
         // Arrange
@@ -148,7 +148,7 @@ public class Tests
         result.Result.Should().Be(2);
     }
 
-    [Test]
+    [Test, Description("Test that applying a function to a Failure results in a Failure.")]
     public void FmapFailureTest()
     {
         // Arrange
@@ -160,6 +160,50 @@ public class Tests
 
         // Assert
         Assert.That(result.Value is Failure);
+    }
+
+    [Test, Description("Test that applying a function to a Failure carries the original message.")]
+    public void FmapFailureMessageTest()
+    {
+        // Arrange
+        var message = "Could not process instruction";
+        var either = Either<int>.From(message);
+        Func<int, int> add1 = x => x + 1;
+
+        // Act
+        var result = either.Fmap(add1);
+
+        // Assert
+        Assert.That(result.Message == message);
+    }
+
+    [Test, Description("Test that applying a function that returns an Either returns the result in an Either.")]
+    public void BindSuccessTest()
+    {
+        // Arrange
+        var either = Either<int>.From(1);
+        Func<int, Either<int>> add1 = x => Either<int>.From(x + 1);
+
+        // Act
+        var result = (Success<int>)either.Bind(add1).Value;
+
+        // Assert
+        result.Result.Should().Be(2);
+    }
+
+    [Test, Description("Test that applying a function that returns an Either returns the result in an Either.")]
+    public void BindFailureTest()
+    {
+        // Arrange
+        var message = "Failure";
+        var either = Either<int>.From(message);
+        Func<int, Either<int>> add1 = x => Either<int>.From(x + 1);
+
+        // Act
+        var result = either.Bind(add1);
+
+        // Assert
+        result.Message.Should().Be(message);
     }
 
 
