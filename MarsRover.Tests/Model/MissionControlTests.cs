@@ -36,7 +36,7 @@ namespace MarsRover.Tests.Model
             var rotatedRover = (Success<Rover>)missionControl.RotateRover(1, RotateInstruction.R).Value;
 
             // Assert
-            rotatedRover.Result.Direction.Should().Be(expectedDirection);
+            rotatedRover.Value.Direction.Should().Be(expectedDirection);
         }
 
     }

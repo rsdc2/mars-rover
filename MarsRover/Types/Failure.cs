@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace MarsRover.Types
 {
-    internal class Failure : ISuccessFailure
+    internal class Failure<T> : IResult<T>
     {
-        public string Message { get; set; }
+        public string Message { get; private set; }
+
+        public T? Value { get; private set; } = default(T);
 
         public Failure(string message)
         {

@@ -10,17 +10,19 @@ namespace MarsRover.Types
     internal class Either<T>
     {
 
-        public ISuccessFailure Value { get; set; }
-        public bool IsFailure { get => Value is Failure; }
+        public IResult<T> Value { get; set; }
+        public bool IsFailure { get => Value is Failure<T>; }
         public bool IsSuccess { get => Value is Success<T>; }
         public string Message { get => Value.Message; }
+
+        public T? Result { get => Value.Value; }
 
         public Either(Success<T> success) 
         {
             Value = success;
         }
 
-        public Either(Failure failure)
+        public Either(Failure<T> failure)
         {
             Value = failure;
         }
@@ -29,19 +31,19 @@ namespace MarsRover.Types
         {
             if (Value is Success<T> success)
             {
-                var newValue = f(success.Result);
+                var newValue = f(success.Value);
                 return newValue;
             }
 
             return Either<U>.From(Value.Message);
         }
 
-        public static List<Failure> Failures(IEnumerable<Either<T>> results)
+        public static List<Failure<T>> Failures(IEnumerable<Either<T>> results)
         {
-            List<Failure> failures = [];
+            List<Failure<T>> failures = [];
             foreach (var either in results)
             {
-                if (either.Value is Failure failure)
+                if (either.Value is Failure<T> failure)
                 {
                     failures.Add(failure);
                 }
@@ -54,7 +56,7 @@ namespace MarsRover.Types
         {
             if (Value is Success<T> success)
             {
-                var newValue = f(success.Result);
+                var newValue = f(success.Value);
                 return Either<U>.From(newValue);
             }
 
@@ -63,7 +65,7 @@ namespace MarsRover.Types
 
         public static Either<T> From(string message)
         {
-            var failure = new Failure(message);
+            var failure = new Failure<T>(message);
             return new Either<T>(failure);
         }
 
@@ -75,7 +77,7 @@ namespace MarsRover.Types
 
         public static Either<T> FromFailure(string message)
         {
-            var failure = new Failure(message);
+            var failure = new Failure<T>(message);
             return new Either<T>(failure);
         }
 
@@ -99,7 +101,7 @@ namespace MarsRover.Types
             var resultsList = results.ToList();
             if (Succeeded(resultsList))
             {
-                var newResults = results.Select(result => ((Success<T>)result.Value).Result).ToList();
+                var newResults = results.Select(result => ((Success<T>)result.Value).Value).ToList();
                 return Either<List<T>>.From(newResults);
             }
             var messages = Failures(results).Select(failure => failure.Message);

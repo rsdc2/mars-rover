@@ -32,7 +32,7 @@ namespace MarsRover.Tests.Model
             var newDirection = (Success<Direction>)rover.Rotate(rotation).Value;
 
             // Assert
-            newDirection.Result.Should().Be(finalDirection);
+            newDirection.Value.Should().Be(finalDirection);
         }
 
 

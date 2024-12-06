@@ -42,6 +42,7 @@ internal static partial class InputParser
         var instructions = instructionString.Select(c => c.ToInstruction());
         var unwrapped = Either<Instruction>.Unwrap(instructions);
         if (Either<Instruction>.Succeeded(instructions)) {
+            
             return unwrapped.Fmap(InstructionSet.FromList);
         }
 
@@ -66,7 +67,7 @@ internal static partial class InputParser
 
         if (x.Value is Success<int> X && y.Value is Success<int> Y)
         {
-            return Either<PlateauSize>.From(new PlateauSize(X.Result, Y.Result));
+            return Either<PlateauSize>.From(new PlateauSize(X.Value, Y.Value));
         }
         return Either<PlateauSize>.From(Messages.InvalidDimensions(dims));
     }
@@ -89,7 +90,7 @@ internal static partial class InputParser
 
         if (x.Value is Success<int> X && y.Value is Success<int> Y && direction.Value is Success<Direction> D)
         { 
-            return Either<RoverPosition>.From(new RoverPosition(X.Result, Y.Result, D.Result));
+            return Either<RoverPosition>.From(new RoverPosition(X.Value, Y.Value, D.Value));
         }
         return Either<RoverPosition>.From(Messages.InvalidPosition(position));
     }

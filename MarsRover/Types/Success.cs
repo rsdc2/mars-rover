@@ -6,20 +6,20 @@ using System.Threading.Tasks;
 
 namespace MarsRover.Types
 {
-    internal class Success<T> : ISuccessFailure
+    internal class Success<T> : IResult<T>
     {
-        public string Message { get; set; } = string.Empty;
-        public T Result { get; private set; }
+        public string Message { get; } = string.Empty;
+        public T? Value { get; }
 
         public Success(T result)
         {
-            Result = result;
+            Value = result;
         }
 
         public Success(T result, string message) 
         {
             Message = message;
-            Result = result;
+            Value = result;
         }
     }
 }

@@ -58,7 +58,7 @@ internal class InputParserTests
     {
         // Act
         var sizeResult = (Success<PlateauSize>)InputParser.ParsePlateauDims(sizeString).Value;
-        var size = sizeResult.Result;
+        var size = sizeResult.Value;
 
         // Assert
         size.x.Should().Be(expectedPlateauSize.x);
@@ -100,7 +100,7 @@ internal class InputParserTests
         var position = (Success<RoverPosition>)InputParser.ParsePosition(positionString).Value;
 
         // Assert
-        Assert.That(position.Result is RoverPosition);
+        Assert.That(position.Value is RoverPosition);
     }
 
 

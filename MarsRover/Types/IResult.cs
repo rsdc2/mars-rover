@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace MarsRover.Types
 {
-    internal interface ISuccessFailure
+    internal interface IResult<T>
 
     {
-        public string Message { get; set; }
+        public string Message { get; }
 
+        public T Value { get; }
     }
 }

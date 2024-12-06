@@ -45,7 +45,7 @@ public class Tests
         var either = Either<int>.FromFailure("Operation successful");
 
         // Assert
-        Assert.That(either.Value is Failure);
+        Assert.That(either.Value is Failure<int>);
     }
 
     [Test, Description("Test that creates a Failure Either from static method using From overload")]
@@ -57,7 +57,7 @@ public class Tests
         var either = Either<int>.From("Operation successful");
 
         // Assert
-        Assert.That(either.Value is Failure);
+        Assert.That(either.Value is Failure<int>);
     }
 
     [Test, Description("Test that unwrap a list of eithers into an either of List")]
@@ -100,7 +100,7 @@ public class Tests
         var unwrapped = Either<int>.Unwrap([either]);
 
         // Assert
-        Assert.That(unwrapped.Value is Failure);
+        Assert.That(unwrapped.Value is Failure<List<int>>);
         unwrapped.Value.Message.Should().Be("Could not perform calculation");
     }
 
@@ -115,7 +115,7 @@ public class Tests
         var unwrapped = Either<int>.Unwrap([either1, either2]);
 
         // Assert
-        Assert.That(unwrapped.Value is Failure);
+        Assert.That(unwrapped.Value is Failure<List<int>>);
         Assert.That(unwrapped.Value.Message == "Could not perform calculation");
     }
 
@@ -130,7 +130,7 @@ public class Tests
         var unwrapped = Either<int>.Unwrap([either1, either2]);
 
         // Assert
-        Assert.That(unwrapped.Value is Failure);
+        Assert.That(unwrapped.Value is Failure<int>);
         unwrapped.Value.Message.Should().Be("Could not perform calculation\nCould not perform calculation");
     }
 
@@ -145,7 +145,7 @@ public class Tests
         var result = (Success<int>)either.Fmap(add1).Value;
 
         // Assert
-        result.Result.Should().Be(2);
+        result.Value.Should().Be(2);
     }
 
     [Test, Description("Test that applying a function to a Failure results in a Failure.")]
@@ -159,7 +159,7 @@ public class Tests
         var result = either.Fmap(add1);
 
         // Assert
-        Assert.That(result.Value is Failure);
+        Assert.That(result.Value is Failure<int>);
     }
 
     [Test, Description("Test that applying a function to a Failure carries the original message.")]
@@ -188,7 +188,7 @@ public class Tests
         var result = (Success<int>)either.Bind(add1).Value;
 
         // Assert
-        result.Result.Should().Be(2);
+        result.Value.Should().Be(2);
     }
 
     [Test, Description("Test that applying a function that returns an Either returns the result in an Either.")]
