@@ -130,7 +130,7 @@ public class Tests
         var unwrapped = Either<int>.Unwrap([either1, either2]);
 
         // Assert
-        Assert.That(unwrapped.Value is Failure<int>);
+        Assert.That(unwrapped.Value is Failure<List<int>>);
         unwrapped.Value.Message.Should().Be("Could not perform calculation\nCould not perform calculation");
     }
 
