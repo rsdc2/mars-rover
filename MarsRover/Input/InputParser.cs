@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using MarsRover.Data;
 using MarsRover.Types;
 using MarsRover.Extensions;
+using System.ComponentModel;
 
 namespace MarsRover.Input;
 
@@ -51,7 +52,26 @@ internal static partial class InputParser
         return Either<InstructionSet>.From($"{Messages.CommandsNotCarriedOut}:\n{failureMessages}");
     }
 
-    public static Either<PlateauSize> ParsePlateauDims(string dims)
+    private static Either<(string, string)> GetPlateauSizeDataFromString(string plateauSize)
+    {
+        try
+        {
+            var groups = Regex
+                .Matches(input: plateauSize, pattern: PlateauSizeRegex().ToString())[0].Groups;
+
+            var x = groups[1].Value;
+            var y = groups[2].Value;
+
+            return Either<(string, string)>.From((x, y));
+        }
+        catch (Exception ex)
+        {
+            return Either<(string, string)>
+               .From(Messages.CannotGetPositionDataFromString(plateauSize, ex.Message));
+        }
+    }
+
+    public static Either<PlateauSize> ParsePlateauSize(string dims)
     {
         if (dims == String.Empty)
         {
@@ -62,8 +82,13 @@ internal static partial class InputParser
             return Either<PlateauSize>.From(Messages.InvalidDimensions(dims));
         }
 
-        var x = dims[0].ToCoordinate();
-        var y = dims[2].ToCoordinate();
+        var stringPlateauSizeData = GetPlateauSizeDataFromString(dims);
+        if (stringPlateauSizeData.IsFailure)
+            return Either<PlateauSize>.From(stringPlateauSizeData.Message);
+
+        var (xStr, yStr) = stringPlateauSizeData.Result;
+        Either<int> x = xStr.ToInt();
+        Either<int> y = yStr.ToInt();
 
         if (x.Value is Success<int> X && y.Value is Success<int> Y)
         {
@@ -120,7 +145,7 @@ internal static partial class InputParser
     [GeneratedRegex(@"[LRM]+")]
     private static partial Regex InstructionRegex();
 
-    [GeneratedRegex(@"^[0-9] [0-9]$")]
+    [GeneratedRegex(@"^([0-9]+?) ([0-9]+)$")]
     private static partial Regex PlateauSizeRegex();
 
     [GeneratedRegex(@"^([0-9]+?) ([0-9]+?) ([NESW])$")]

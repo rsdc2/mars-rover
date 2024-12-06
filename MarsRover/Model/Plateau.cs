@@ -13,8 +13,8 @@ internal class Plateau(PlateauSize plateauSize)
 {
     public PlateauSize PlateauSize { get; set; } = plateauSize;
 
-    public int MaxX { get => PlateauSize.x; }
-    public int MaxY { get => PlateauSize.y; }
+    public int MaxX { get => PlateauSize.X; }
+    public int MaxY { get => PlateauSize.Y; }
 
     public static Plateau From(int x, int y)
     {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MarsRover.Data
 {
-    internal record PlateauSize(int x, int y)
+    internal record PlateauSize(int X, int Y)
     {
         public static PlateauSize From(int x, int y)
         {

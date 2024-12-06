@@ -28,18 +28,16 @@ internal class InputParserTests
     }
 
     [TestCase("1 3 ")]
-    [TestCase ("5 7")]
-    [TestCase ("10 5")]
+    [TestCase ("asd5 7")]
+    [TestCase ("10ga5")]
     public void InvalidPlateauSizeReturnsFailureWithMessage(string sizeString)
     {
         // Act
-        var size = InputParser.ParsePlateauDims(sizeString);
+        var size = InputParser.ParsePlateauSize(sizeString);
 
         // Assert
         size.Message.Should().Be(Messages.InvalidDimensions(sizeString));
     }
-
-
     public static IEnumerable<TestCaseData> TestPlateauSizes
     {
         get
@@ -47,6 +45,9 @@ internal class InputParserTests
             yield return new TestCaseData("1 3", PlateauSize.From(1, 3));
             yield return new TestCaseData("3 4", PlateauSize.From(3, 4));
             yield return new TestCaseData("2 3", PlateauSize.From(2, 3));
+            yield return new TestCaseData("10 20", PlateauSize.From(10, 20));
+            yield return new TestCaseData("22 30", PlateauSize.From(22, 30));
+            yield return new TestCaseData("3 15", PlateauSize.From(3, 15));
         }
     }
 
@@ -57,12 +58,11 @@ internal class InputParserTests
     )
     {
         // Act
-        var sizeResult = (Success<PlateauSize>)InputParser.ParsePlateauDims(sizeString).Value;
-        var size = sizeResult.Value;
+        var sizeResult = InputParser.ParsePlateauSize(sizeString).Result;
 
         // Assert
-        size.x.Should().Be(expectedPlateauSize.x);
-        size.y.Should().Be(expectedPlateauSize.y);
+        sizeResult.X.Should().Be(expectedPlateauSize.X);
+        sizeResult.Y.Should().Be(expectedPlateauSize.Y);
     }
 
     [Test]
@@ -72,7 +72,6 @@ internal class InputParserTests
     [TestCase("8 -9 W")]
     public void InvalidCoordinatesReturnsFailureWithMessage(string position)
     {
-
         // Act
         var parsedPosition = InputParser.ParsePosition(position);
 
