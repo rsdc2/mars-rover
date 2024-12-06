@@ -35,6 +35,51 @@ namespace MarsRover.Tests.Model
             newDirection.Value.Should().Be(finalDirection);
         }
 
+        [Test, Description("Test that can move the rover one position forwards in the direction that it is facing")]
+        [TestCase(1, 1, Direction.N, 1, 2)]
+        [TestCase(1, 1, Direction.W, 0, 1)]
+        [TestCase(3, 4, Direction.S, 3, 3)]
+        [TestCase(2, 3, Direction.E, 3, 3)]
+        public void RoverMoveSuccessfullyTests(
+            int initialX,
+            int initialY,
+            Direction initialDirection,
+            int expectedX,
+            int expectedY
+        )
+        {
+            // Arrange 
+            var position = new RoverPosition(initialX, initialY, initialDirection);
+            var rover = new Rover(position);
 
+            // Act
+            var newPosition = rover.Move();
+
+            // Assert
+            newPosition.Result.X.Should().Be(expectedX);
+            newPosition.Result.Y.Should().Be(expectedY);
+        }
+    
+
+        [Test, Description("Test that returns failure when cannot move")]
+        [TestCase(0, 0, Direction.S)]
+        [TestCase(0, 0, Direction.W)]
+        public void RoverMoveFailureTests(
+            int initialX,
+            int initialY,
+            Direction initialDirection
+        )
+        {
+            // Arrange 
+            var position = new RoverPosition(initialX, initialY, initialDirection);
+            var rover = new Rover(position);
+
+            // Act
+            var newPosition = rover.Move();
+
+            // Assert
+            Assert.That(newPosition.Value is Failure<Rover>);
+        }
     }
+
 }

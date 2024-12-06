@@ -18,6 +18,11 @@ internal static class Messages
     public static string NoInstruction = "No instruction given";
     public static string NoPosition = "No position given";
 
+    public static string CannotMoveRover(int roverId)
+    {
+        return $"Cannot move Rover {roverId}";
+    }
+
     public static string CannotRotateRover(Rover rover)
     {
         return $"Cannot rotate Rover {rover.Id}";

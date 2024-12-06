@@ -10,7 +10,7 @@ namespace MarsRover.Types
     {
         public string Message { get; private set; }
 
-        public T? Value { get; private set; } = default;
+        public T? Value { get; } = default;
 
         public Failure(string message)
         {

@@ -6,10 +6,17 @@ using System.Threading.Tasks;
 
 namespace MarsRover.Data
 {
-    internal class RoverPosition(int x, int y, Direction direction)
+    internal record RoverPosition(int X, int Y, Direction Direction)
     {
-        public int X = x; 
-        public int Y = y;
-        public Direction Direction = direction;
+        //public int X = x; 
+        //public int Y = y;
+        //public Direction Direction = direction;
+
+        public (int, int, Direction) Triple { get => (X, Y, Direction); }
+
+        public static RoverPosition From(int x, int y, Direction direction)
+        {
+            return new RoverPosition(x, y, direction);
+        }
     };
 }

@@ -9,7 +9,7 @@ namespace MarsRover.Types
     internal class Success<T> : IResult<T>
     {
         public string Message { get; } = string.Empty;
-        public T? Value { get; }
+        public T Value { get; }
 
         public Success(T result)
         {

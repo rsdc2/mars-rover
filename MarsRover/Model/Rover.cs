@@ -20,7 +20,6 @@ namespace MarsRover.Model
         public Direction Direction 
         { 
             get => Position.Direction;
-            set => Position.Direction = value;
         }
 
         public Rover(RoverPosition position) 
@@ -28,7 +27,38 @@ namespace MarsRover.Model
             Position = position;
             Rovers++;
             Id = Rovers;
-        }  
+        }
+
+        /// <summary>
+        /// Get new position of the rover when it moves one block in the direction that it is facing
+        /// </summary>
+        /// <returns></returns>
+        public Either<RoverPosition> GetNewPosition() => Position.Triple switch
+        {
+            (_, 0, Direction.S) => Either<RoverPosition>.From(Messages.CannotMoveRover(Id)),
+            (0, _, Direction.W) => Either<RoverPosition>.From(Messages.CannotMoveRover(Id)),
+            (_, _, Direction.E) => Either<RoverPosition>.From(Position with { X = Position.X + 1 }),
+            (_, _, Direction.W) => Either<RoverPosition>.From(Position with { X = Position.X - 1 }),
+            (_, _, Direction.N) => Either<RoverPosition>.From(Position with { Y = Position.Y + 1 }),
+            (_, _, Direction.S) => Either<RoverPosition>.From(Position with { Y = Position.Y - 1 }),
+            _ => Either<RoverPosition>.From(Messages.CannotMoveRover(Id))
+        };
+
+        /// <summary>
+        /// Move the Rover one unit in the direction that it is facing
+        /// </summary>
+        /// <returns></returns>
+        public Either<Rover> Move()
+        {
+            var newPosition = GetNewPosition();
+            if (newPosition.Value is Success<RoverPosition> success)
+            {
+                Position = success.Value;
+                return Either<Rover>.From(this);
+            }
+
+            return Either<Rover>.From(newPosition.Message);
+        }
 
         public Either<Direction> Rotate(RotateInstruction rotation)
         {
@@ -36,7 +66,7 @@ namespace MarsRover.Model
             var rotationInt = (int)rotation;
 
             var newDirection = (Direction)((4 + directionInt + rotationInt) % 4);
-            Direction = newDirection;
+            Position = Position with { Direction = newDirection };
             return Either<Direction>.From(Direction);
         }
 
