@@ -7,12 +7,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MarsRover.Model
+namespace MarsRover.Model;
+
+internal class Plateau(PlateauSize plateauSize)
 {
-    internal class Plateau(PlateauSize plateauSize)
+    public PlateauSize PlateauSize { get; set; } = plateauSize;
+
+    public static Plateau From(int x, int y)
     {
-        public PlateauSize PlateauSize { get; set; } = plateauSize;
-
-
+        var size = new PlateauSize(x, y);
+        return new Plateau(size);
     }
+
 }

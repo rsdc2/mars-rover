@@ -25,8 +25,23 @@ namespace MarsRover.Tests.Model
             var updatedMissionControl = missionControl.AddRover(rover);
 
             // Assert
-            updatedMissionControl.Result.Rovers.Count.Should().Be(1);
+            updatedMissionControl.Value.Value.Rovers.Count.Should().Be(1);
             missionControl.Rovers.Count.Should().Be(1);
+        }
+
+        [Test, Description("Test that can add plateau successfully")]
+        public void AddPlateauSuccess()
+        {
+            // Arrange 
+            var position = new RoverPosition(1, 1, Direction.W);
+            var rover = Plateau.From(5, 5);
+            var missionControl = new MissionControl();
+
+            // Act
+            var updatedMissionControl = missionControl.AddPlateau(rover);
+
+            // Assert
+            updatedMissionControl.Result.Should().NotBeNull();
         }
 
         [Test, Description("Test that can find rover with Id")]
@@ -75,8 +90,7 @@ namespace MarsRover.Tests.Model
         )
         {
             // Arrange 
-            //var position = new RoverPosition(1, 1, initialDirection);
-            var rover = new Rover(RoverPosition.From(1, 1, initialDirection));
+            var rover = Rover.From(1, 1, initialDirection);
             var missionControl = new MissionControl();
             missionControl.AddRover(rover);
 
@@ -84,7 +98,6 @@ namespace MarsRover.Tests.Model
             var rotatedRover = missionControl.RotateRover(Rover.RoverCount, rotation);
 
             // Assert
-            Thread.Sleep(5);
             rotatedRover.Value.Value.Direction.Should().Be(expectedDirection);
         }
 

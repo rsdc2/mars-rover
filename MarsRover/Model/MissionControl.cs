@@ -26,9 +26,10 @@ namespace MarsRover.Model
             return Either<MissionControl>.From(this);
         }
 
-        public Either<Plateau> AddPlateau(Plateau plateau)
+        public Either<MissionControl> AddPlateau(Plateau plateau)
         {
-            return Either<Plateau>.From(Messages.CannotAddPlateau);
+            Plateau = plateau;
+            return Either<MissionControl>.From(this);
         }
 
         public Either<Rover> GetRoverById(int id) => Rovers.Where(rover => rover.Id == id).ToList().Count switch
