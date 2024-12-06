@@ -12,31 +12,80 @@ namespace MarsRover.Tests.Model
 {
     internal class MissionControlTests
     {
-        [TestCase(1, 1, Direction.N, 1, 2, Direction.N)]
-        [TestCase(1, 1, Direction.N, 1, 2, Direction.N)]
-        [TestCase(1, 1, Direction.N, 1, 2, Direction.N)]
-        [TestCase(1, 1, Direction.N, 1, 2, Direction.N)]
-        [TestCase(1, 1, Direction.N, 1, 2, Direction.N)]
-        public void RotateRoverTest(
-            int initialX,
-            int initialY,
-            Direction initialDirection,
-            int expectedX,
-            int expectedY,
-            Direction expectedDirection
-        )
+
+        [Test, Description("Test that can find rover with Id")]
+        public void AddRoverSuccessTest()
         {
             // Arrange 
-            var position = new RoverPosition(initialX, initialY, initialDirection);
+            var position = new RoverPosition(1, 1, Direction.W);
+            var rover = new Rover(position);
+            var missionControl = new MissionControl();
+
+            // Act
+            var updatedMissionControl = missionControl.AddRover(rover);
+
+            // Assert
+            updatedMissionControl.Result.Rovers.Count.Should().Be(1);
+            missionControl.Rovers.Count.Should().Be(1);
+        }
+
+        [Test, Description("Test that can find rover with Id")]
+        public void FindRoverSuccessTest()
+        {
+            // Arrange 
+            var position = new RoverPosition(1, 1, Direction.W);
             var rover = new Rover(position);
             var missionControl = new MissionControl();
             missionControl.AddRover(rover);
 
             // Act
-            var rotatedRover = (Success<Rover>)missionControl.RotateRover(1, RotateInstruction.R).Value;
+            var foundRover = missionControl.GetRoverById(Rover.RoverCount);
 
             // Assert
-            rotatedRover.Value.Direction.Should().Be(expectedDirection);
+            foundRover.IsSuccess.Should().BeTrue();
+        }
+
+
+        [Test, Description("Test that returns Failure if Rover does not exist")]
+        public void FindRoverFailureTest()
+        {
+            // Arrange 
+            var missionControl = new MissionControl();
+
+            // Act
+            var foundRover = missionControl.GetRoverById(1);
+
+            // Assert
+            foundRover.IsFailure.Should().BeTrue();
+        }
+
+
+        [Test, Description("Test that mission control can rotate a rover sucessfully")]
+        [TestCase(Direction.E, RotateInstruction.L, Direction.N)]
+        [TestCase(Direction.S, RotateInstruction.L, Direction.E)]
+        [TestCase(Direction.W, RotateInstruction.L, Direction.S)]
+        [TestCase(Direction.N, RotateInstruction.R, Direction.E)]
+        [TestCase(Direction.E, RotateInstruction.R, Direction.S)]
+        [TestCase(Direction.S, RotateInstruction.R, Direction.W)]
+        [TestCase(Direction.W, RotateInstruction.R, Direction.N)]
+        public void RotateRoverTest(
+            Direction initialDirection,
+            RotateInstruction rotation,
+            Direction expectedDirection
+        )
+        {
+            // Arrange 
+            //var position = new RoverPosition(1, 1, initialDirection);
+            var rover = new Rover(RoverPosition.From(1, 1, initialDirection));
+            var missionControl = new MissionControl();
+            missionControl.AddRover(rover);
+
+            // Act
+            var rotatedRover = missionControl.RotateRover(Rover.RoverCount, rotation);
+
+            // Assert
+            Thread.Sleep(5);
+            rotatedRover.Value.Value.Direction.Should().Be(expectedDirection);
         }
 
     }

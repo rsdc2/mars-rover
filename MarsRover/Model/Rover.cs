@@ -10,7 +10,7 @@ namespace MarsRover.Model
 {
     internal class Rover
     {
-        public static int Rovers { get; private set; } = 0;
+        public static int RoverCount { get; private set; } = 0;
         public RoverPosition Position { get; private set; }
 
         public int Id { get; private set; }
@@ -25,8 +25,13 @@ namespace MarsRover.Model
         public Rover(RoverPosition position) 
         {
             Position = position;
-            Rovers++;
-            Id = Rovers;
+            RoverCount++;
+            Id = RoverCount;
+        }
+
+        public static Rover From(int x, int y, Direction direction)
+        {
+            return new Rover(RoverPosition.From(x, y, direction));
         }
 
         /// <summary>
@@ -60,14 +65,14 @@ namespace MarsRover.Model
             return Either<Rover>.From(newPosition.Message);
         }
 
-        public Either<Direction> Rotate(RotateInstruction rotation)
+        public Either<Rover> Rotate(RotateInstruction rotation)
         {
             var directionInt = (int)Direction;
             var rotationInt = (int)rotation;
 
             var newDirection = (Direction)((4 + directionInt + rotationInt) % 4);
             Position = Position with { Direction = newDirection };
-            return Either<Direction>.From(Direction);
+            return Either<Rover>.From(this);
         }
 
     }

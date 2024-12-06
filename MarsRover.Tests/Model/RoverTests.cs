@@ -29,10 +29,10 @@ namespace MarsRover.Tests.Model
             var rover = new Rover(position);
 
             // Act
-            var newDirection = (Success<Direction>)rover.Rotate(rotation).Value;
+            var roverWithNewDirection = rover.Rotate(rotation);
 
             // Assert
-            newDirection.Value.Should().Be(finalDirection);
+            roverWithNewDirection.Value.Value.Direction.Should().Be(finalDirection);
         }
 
         [Test, Description("Test that can move the rover one position forwards in the direction that it is facing")]

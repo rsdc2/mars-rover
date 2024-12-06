@@ -31,8 +31,8 @@ namespace MarsRover.Types
         {
             if (Value is Success<T> success)
             {
-                var newValue = f(success.Value);
-                return newValue;
+                var newEither = f(success.Value);
+                return newEither;
             }
 
             return Either<U>.From(Value.Message);

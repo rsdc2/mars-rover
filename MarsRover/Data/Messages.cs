@@ -53,5 +53,15 @@ internal static class Messages
         return $"Position {position} is not valid";
     }
 
+    public static string MoreThanOneRoverWithId(int id)
+    {
+        return $"More than one rover with {id} exists";
+    }
+
+    public static string RoverDoesNotExist(int id)
+    {
+        return $"Rover with id {id} does not exist";
+    }
+
 
 }

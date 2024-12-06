@@ -19,10 +19,11 @@ namespace MarsRover.Model
         /// Adds a rover to the inventory of rovers
         /// </summary>
         /// <param name="rover">A new Rover to add</param>
-        /// <returns>An Either of a List of all Rover objects</returns>
-        public Either<List<Rover>> AddRover(Rover rover)
+        /// <returns>An Either of the updated MissionControl</returns>
+        public Either<MissionControl> AddRover(Rover rover)
         {
-            return Either<List<Rover>>.From(Messages.CannotAddRover);
+            Rovers.Add(rover);
+            return Either<MissionControl>.From(this);
         }
 
         public Either<Plateau> AddPlateau(Plateau plateau)
@@ -30,9 +31,20 @@ namespace MarsRover.Model
             return Either<Plateau>.From(Messages.CannotAddPlateau);
         }
 
+        public Either<Rover> GetRoverById(int id) => Rovers.Where(rover => rover.Id == id).ToList().Count switch
+        {
+            0 => Either<Rover>.From(Messages.RoverDoesNotExist(id)),
+            1 => Either<Rover>.From(Rovers.Where(rover => rover.Id == id).First()),
+            _ => Either<Rover>.From(Messages.MoreThanOneRoverWithId(id))
+        };
+
         public Either<Rover> RotateRover(int roverId, RotateInstruction rotation)
         {
-            return Either<Rover>.From(Messages.CannotRotateRover(roverId));
+            //var rover = GetRoverById(roverId);
+            //var rotated = rover.Bind(rover => rover.Rotate(rotation));
+            //return rotated;
+
+            return GetRoverById(roverId).Bind(rover => rover.Rotate(rotation));
         }
     }
 }
