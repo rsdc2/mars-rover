@@ -31,7 +31,6 @@ namespace MarsRover.Tests.Extensions
         [TestCase("")]
         [TestCase("hello")]
         [TestCase(".sdkjtw3")]
-
         public void StringToIntSadTest(string input)
         {
             // Act
