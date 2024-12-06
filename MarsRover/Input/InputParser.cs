@@ -72,8 +72,7 @@ internal static partial class InputParser
         return Either<PlateauSize>.From(Messages.InvalidDimensions(dims));
     }
 
-
-    public static Either<(string, string, string)> GetPositionDataFromString(string position)
+    private static Either<(string, string, string)> GetPositionDataFromString(string position)
     {
         try
         {
