@@ -74,8 +74,6 @@ namespace MarsRover.Model
             Position = Position with { Direction = newDirection };
             return Either<Rover>.From(this);
         }
-
-
         public Either<Rover> UpdateX(int x)
         {
             if (x < 0)
@@ -85,7 +83,6 @@ namespace MarsRover.Model
             Position = Position with { X = x };
             return Either<Rover>.From(this);
         }
-
         public Either<Rover> UpdateY(int y)
         {
             if (y < 0)
@@ -96,6 +93,12 @@ namespace MarsRover.Model
             return Either<Rover>.From(this);
         }
 
+        public string Description()
+        {
+            return $"\t\t- Rover {Id} at ({Position.X}, {Position.Y}) " +
+                $"facing {Position.Direction}";
+
+        }
 
     }
 }

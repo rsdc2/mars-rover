@@ -11,9 +11,15 @@ namespace MarsRover.Model
     internal class MissionControl
     {
         public List<Rover> Rovers { get; private set; } = [];
-        public Plateau Plateau { get; private set; } = Plateau.From(0, 0);
+        public Plateau Plateau { get; private set; } = Plateau.FromInts(0, 0);
 
         public MissionControl() { }
+
+        public Either<MissionControl> AddPlateau(Plateau plateau)
+        {
+            Plateau = plateau;
+            return Either<MissionControl>.From(this);
+        }
 
         /// <summary>
         /// Adds a rover to the inventory of rovers
@@ -26,10 +32,18 @@ namespace MarsRover.Model
             return Either<MissionControl>.From(this);
         }
 
-        public Either<MissionControl> AddPlateau(Plateau plateau)
+        public Either<MissionControl> AddRover(RoverPosition position)
         {
-            Plateau = plateau;
+            var rover = new Rover(position);
+            Rovers.Add(rover);
             return Either<MissionControl>.From(this);
+        }
+
+        public static Either<MissionControl> FromPlateau(Plateau plateau)
+        {
+            var missionControl = new MissionControl();
+            missionControl.AddPlateau(plateau);
+            return Either<MissionControl>.From(missionControl);
         }
 
         public Either<Rover> GetRoverById(int roverId) =>
@@ -77,10 +91,18 @@ namespace MarsRover.Model
             }
             return Either<Rover>.From(Messages.Unforeseen);
         }
-
         public Either<Rover> RotateRover(int roverId, RotateInstruction rotation)
         {
             return GetRoverById(roverId).Bind(rover => rover.Rotate(rotation));
+        }
+
+        public string Description()
+        {
+            var roversStrings = Rovers.Select(rover => rover.Description());
+            var roversString = String.Join('\n', roversStrings);
+            return $"Mission control status:\n" +
+                $"\t- Plateau size: ({Plateau.MaxX}, {Plateau.MaxY})\n" +
+                $"\t- Rovers:\n" + roversString;
         }
     }
 }

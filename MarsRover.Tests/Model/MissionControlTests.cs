@@ -34,7 +34,7 @@ namespace MarsRover.Tests.Model
         {
             // Arrange 
             var position = new RoverPosition(1, 1, Direction.W);
-            var plateau = Plateau.From(5, 5);
+            var plateau = Plateau.FromInts(5, 5);
             var missionControl = new MissionControl();
 
             // Act
@@ -90,7 +90,7 @@ namespace MarsRover.Tests.Model
         {
             // Arrange 
             var rover = Rover.From(1, 1, initialDirection);
-            var plateau = Plateau.From(5, 5);
+            var plateau = Plateau.FromInts(5, 5);
             var missionControl = new MissionControl();
             missionControl.AddPlateau(plateau);
             missionControl.AddRover(rover);
@@ -119,7 +119,7 @@ namespace MarsRover.Tests.Model
         {
             // Arrange 
             var rover = Rover.From(initialX, initialY, initialDirection);
-            var plateau = Plateau.From(plateauX, plateauY);
+            var plateau = Plateau.FromInts(plateauX, plateauY);
             var missionControl = new MissionControl();
             missionControl.AddPlateau(plateau);
             missionControl.AddRover(rover);
