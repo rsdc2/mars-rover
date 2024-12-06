@@ -29,11 +29,11 @@ namespace MarsRover.Model
             Id = RoverCount;
         }
 
-        public static Rover From(int x, int y, Direction direction)
-        {
-            return new Rover(RoverPosition.From(x, y, direction));
-        }
+        public static Rover From(int x, int y, Direction direction) =>
+            new Rover(RoverPosition.From(x, y, direction));
 
+        public static Rover From(RoverPosition position) => new Rover(position);
+ 
         /// <summary>
         /// Get new position of the rover when it moves one block in the direction that it is facing
         /// </summary>
@@ -74,6 +74,28 @@ namespace MarsRover.Model
             Position = Position with { Direction = newDirection };
             return Either<Rover>.From(this);
         }
+
+
+        public Either<Rover> UpdateX(int x)
+        {
+            if (x < 0)
+            {
+                return Either<Rover>.From(Messages.CannotMoveRover(Id));
+            }
+            Position = Position with { X = x };
+            return Either<Rover>.From(this);
+        }
+
+        public Either<Rover> UpdateY(int y)
+        {
+            if (y < 0)
+            {
+                return Either<Rover>.From(Messages.CannotMoveRover(Id));
+            }
+            Position = Position with { Y = y };
+            return Either<Rover>.From(this);
+        }
+
 
     }
 }

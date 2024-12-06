@@ -15,7 +15,7 @@ namespace MarsRover.Types
         public bool IsSuccess { get => Value is Success<T>; }
         public string Message { get => Value.Message; }
 
-        public T? Result { get => Value.Value; }
+        public T Result { get => Value.Value; }
 
         public Either(Success<T> success) 
         {

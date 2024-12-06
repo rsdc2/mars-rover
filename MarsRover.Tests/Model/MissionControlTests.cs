@@ -34,14 +34,14 @@ namespace MarsRover.Tests.Model
         {
             // Arrange 
             var position = new RoverPosition(1, 1, Direction.W);
-            var rover = Plateau.From(5, 5);
+            var plateau = Plateau.From(5, 5);
             var missionControl = new MissionControl();
 
             // Act
-            var updatedMissionControl = missionControl.AddPlateau(rover);
+            var updatedMissionControl = missionControl.AddPlateau(plateau);
 
             // Assert
-            updatedMissionControl.Result.Should().NotBeNull();
+            updatedMissionControl.Result.Plateau.Should().NotBeNull();
         }
 
         [Test, Description("Test that can find rover with Id")]
@@ -72,6 +72,63 @@ namespace MarsRover.Tests.Model
 
             // Assert
             foundRover.IsFailure.Should().BeTrue();
+        }
+
+        [Test, Description("Test that mission control can move a rover sucessfully")]
+        [TestCase(1, 1, Direction.N, 1, 2)]
+        [TestCase(1, 1, Direction.W, 0, 1)]
+        [TestCase(1, 1, Direction.S, 1, 0)]
+        [TestCase(1, 1, Direction.E, 2, 1)]
+
+        public void MoveRoverSucessTest(
+            int initialX,
+            int initialY,
+            Direction initialDirection,
+            int expectedX,
+            int expectedY
+        )
+        {
+            // Arrange 
+            var rover = Rover.From(1, 1, initialDirection);
+            var plateau = Plateau.From(5, 5);
+            var missionControl = new MissionControl();
+            missionControl.AddPlateau(plateau);
+            missionControl.AddRover(rover);
+
+            // Act
+            var rotatedRover = missionControl.MoveRover(Rover.RoverCount);
+
+            // Assert
+            rotatedRover.Result.Position.X.Should().Be(expectedX);
+            rotatedRover.Result.Position.Y.Should().Be(expectedY);
+        }
+
+        [Test, Description("Test that returns failure if moves to an impossible location")]
+        [TestCase(0, 0, Direction.S, 5, 5)]
+        [TestCase(0, 0, Direction.W, 5, 5)]
+        [TestCase(1, 1, Direction.N, 1, 1)]
+        [TestCase(3, 5, Direction.E, 3, 7)]
+
+        public void MoveRoverFailureTest(
+                    int initialX,
+                    int initialY,
+                    Direction initialDirection,
+                    int plateauX,
+                    int plateauY
+                )
+        {
+            // Arrange 
+            var rover = Rover.From(initialX, initialY, initialDirection);
+            var plateau = Plateau.From(plateauX, plateauY);
+            var missionControl = new MissionControl();
+            missionControl.AddPlateau(plateau);
+            missionControl.AddRover(rover);
+
+            // Act
+            var movedRover = missionControl.MoveRover(Rover.RoverCount);
+
+            // Assert
+            Assert.That(movedRover.Value is Failure<Rover>);
         }
 
 
