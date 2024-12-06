@@ -64,17 +64,20 @@ internal class InputParserTests
         size.x.Should().Be(expectedPlateauSize.x);
         size.y.Should().Be(expectedPlateauSize.y);
     }
+
     [Test]
-    public void InvalidCoordinatesReturnsFailureWithMessage()
+    [TestCase("-1 2 N")]
+    [TestCase("-5 2 E")]
+    [TestCase("7 -3 S")]
+    [TestCase("8 -9 W")]
+    public void InvalidCoordinatesReturnsFailureWithMessage(string position)
     {
-        // Arrange
-        var positionString = "5 7 N";
 
         // Act
-        var position = InputParser.ParsePosition(positionString);
+        var parsedPosition = InputParser.ParsePosition(position);
 
         // Assert
-        Assert.That(position.Message == Messages.InvalidPosition(positionString));
+        Assert.That(parsedPosition.Message == Messages.InvalidPosition(position));
     }
 
     [Test]
@@ -91,16 +94,17 @@ internal class InputParserTests
     }
 
     [Test]
-    public void ValidPositionReturnsSuccessWithPosition()
+    [TestCase("1 2 N")]
+    [TestCase("5 2 E")]
+    [TestCase("7 3 S")]
+    [TestCase("8 9 W")]
+    public void ValidPositionReturnsSuccessWithPosition(string position)
     {
-        // Arrange
-        var positionString = "1 2 N";
-
         // Act
-        var position = (Success<RoverPosition>)InputParser.ParsePosition(positionString).Value;
+        var parsedPosition = InputParser.ParsePosition(position);
 
         // Assert
-        Assert.That(position.Value is RoverPosition);
+        Assert.That(parsedPosition.IsSuccess);
     }
 
 

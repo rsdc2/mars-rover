@@ -73,23 +73,46 @@ internal static partial class InputParser
     }
 
 
+    public static Either<(string, string, string)> GetPositionDataFromString(string position)
+    {
+        try
+        {
+            var groups = Regex
+                .Matches(input: position, pattern: PositionRegex().ToString())[0].Groups;
+
+            var x = groups[1].Value;
+            var y = groups[2].Value;
+            var direction = groups[3].Value;
+
+            return Either<(string, string, string)>.From((x, y, direction));
+        }
+        catch (Exception ex)
+        {
+            return Either<(string, string, string)>
+               .From(Messages.CannotGetPositionDataFromString(position, ex.Message));
+        }
+    }
+
     public static Either<RoverPosition> ParsePosition(string position)
     {
         if (position == String.Empty)
         {
             return Either<RoverPosition>.From(Messages.NoPosition);
         }
-        else if (!(IsValidPosition(position))) 
-        {
+        else if (!(IsValidPosition(position)))
             return Either<RoverPosition>.From(Messages.InvalidPosition(position));
-        }
 
-        var x = position[0].ToCoordinate();
-        var y = position[2].ToCoordinate();
-        var direction = position[4].ToDirection();
+        var stringPositionData = GetPositionDataFromString(position);
+        if (stringPositionData.IsFailure) 
+            return Either<RoverPosition>.From(stringPositionData.Message);
 
-        if (x.Value is Success<int> X && y.Value is Success<int> Y && direction.Value is Success<Direction> D)
-        { 
+        var (xStr, yStr, dStr) = stringPositionData.Result;
+        Either<int> x = xStr.ToInt();
+        Either<int> y = yStr.ToInt();
+        Either<Direction> d = dStr.ToDirection();
+
+        if (x.Value is Success<int> X && y.Value is Success<int> Y && d.Value is Success<Direction> D)
+        {
             return Either<RoverPosition>.From(new RoverPosition(X.Value, Y.Value, D.Value));
         }
         return Either<RoverPosition>.From(Messages.InvalidPosition(position));
@@ -98,9 +121,9 @@ internal static partial class InputParser
     [GeneratedRegex(@"[LRM]+")]
     private static partial Regex InstructionRegex();
 
-    [GeneratedRegex(@"^[0-5] [0-5]$")]
+    [GeneratedRegex(@"^[0-9] [0-9]$")]
     private static partial Regex PlateauSizeRegex();
 
-    [GeneratedRegex(@"^[0-5] [0-5] [NESW]$")]
+    [GeneratedRegex(@"^([0-9]+?) ([0-9]+?) ([NESW])$")]
     private static partial Regex PositionRegex();
 }

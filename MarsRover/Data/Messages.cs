@@ -19,9 +19,18 @@ internal static class Messages
     public static string NoPosition = "No position given";
     public static string Unforeseen = "Unforeseen";
 
+    public static string CannotGetPositionDataFromString(string input, string message)
+    {
+        return $"Cannot get position data from string '{input}': {message}";
+    }
     public static string CannotMoveRover(int roverId)
     {
         return $"Cannot move Rover {roverId}";
+    }
+
+    public static string CannotParseStringToInteger(string str, string message)
+    {
+        return $"Cannot parse string '{str}' to integer: {message}";
     }
 
     public static string CannotRotateRover(Rover rover)
@@ -35,6 +44,10 @@ internal static class Messages
     }
 
     public static string InvalidDirection(char direction)
+    {
+        return $"Direction {direction} is not valid";
+    }
+    public static string InvalidDirection(string direction)
     {
         return $"Direction {direction} is not valid";
     }
