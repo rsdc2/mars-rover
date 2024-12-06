@@ -40,10 +40,6 @@ namespace MarsRover.Model
 
         public Either<Rover> RotateRover(int roverId, RotateInstruction rotation)
         {
-            //var rover = GetRoverById(roverId);
-            //var rotated = rover.Bind(rover => rover.Rotate(rotation));
-            //return rotated;
-
             return GetRoverById(roverId).Bind(rover => rover.Rotate(rotation));
         }
     }
