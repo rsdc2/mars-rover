@@ -9,7 +9,6 @@ namespace MarsRover.Types
 {
     internal class Either<T>
     {
-
         public IResult<T> Value { get; set; }
         public bool IsFailure { get => Value is Failure<T>; }
         public bool IsSuccess { get => Value is Success<T>; }

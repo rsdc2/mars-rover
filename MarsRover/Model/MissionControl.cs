@@ -12,9 +12,7 @@ namespace MarsRover.Model
     {
         public List<Rover> Rovers { get; private set; } = [];
         public Plateau Plateau { get; private set; } = Plateau.FromInts(0, 0);
-
         public MissionControl() { }
-
         public Either<MissionControl> AddPlateau(Plateau plateau)
         {
             Plateau = plateau;
@@ -56,9 +54,9 @@ namespace MarsRover.Model
 
         public Either<Rover> MoveRover(int roverId)
         {
-            return GetRoverById(roverId).Bind(rover => MoveRover(rover));   
+            return GetRoverById(roverId)
+                .Bind(MoveRover);   
         }
-
         public Either<Rover> MoveRover(Rover rover) {
             switch (rover.Position)
             {
@@ -95,7 +93,6 @@ namespace MarsRover.Model
         {
             return GetRoverById(roverId).Bind(rover => rover.Rotate(rotation));
         }
-
         public string Description()
         {
             var roversStrings = Rovers.Select(rover => rover.Description());
