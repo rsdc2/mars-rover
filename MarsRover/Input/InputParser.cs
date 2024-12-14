@@ -6,9 +6,11 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using MarsRover.Data;
-using MarsRover.Types;
+using LanguageExt;
+using static LanguageExt.Prelude;
 using MarsRover.Extensions;
 using System.ComponentModel;
+using System.Collections.Immutable;
 
 namespace MarsRover.Input;
 
@@ -32,27 +34,18 @@ internal static partial class InputParser
         return regex.IsMatch(position);
     }
 
-    public static Either<InstructionSet> ParseInstruction(string instructionString)
+    public static Either<string, Seq<Instruction>> ParseInstructions(string instructionString)
     {
+        if (instructionString == String.Empty) 
+            return Left(Messages.NoInstruction);
 
-        if (instructionString == String.Empty)
-        {
-            return Either<InstructionSet>.From(Messages.NoInstruction);
-        }
-
-        var instructions = instructionString.Select(c => c.ToInstruction());
-        var unwrapped = Either<Instruction>.Unwrap(instructions);
-        if (Either<Instruction>.Succeeded(instructions)) {
-            
-            return unwrapped.Fmap(InstructionSet.FromList);
-        }
-
-        var failureMessages = unwrapped.Message;
-
-        return Either<InstructionSet>.From($"{Messages.CommandsNotCarriedOut}:\n{failureMessages}");
+        return instructionString
+            .Select(c => c.ToInstruction())
+            .ToSeq()
+            .Unwrap();
     }
 
-    private static Either<(string, string)> GetPlateauSizeDataFromString(string plateauSize)
+    private static Either<string, (string, string)> GetPlateauSizeDataFromString(string plateauSize)
     {
         try
         {
@@ -62,39 +55,41 @@ internal static partial class InputParser
             var x = groups[1].Value;
             var y = groups[2].Value;
 
-            return Either<(string, string)>.From((x, y));
+            return Right((x, y));
         }
         catch (Exception ex)
         {
-            return Either<(string, string)>
-               .From(Messages.CannotGetPositionDataFromString(plateauSize, ex.Message));
+            return Left(Messages.CannotGetPositionDataFromString(plateauSize, ex.Message));
         }
     }
 
-    public static Either<PlateauSize> ParsePlateauSize(string dims)
+    public static Either<string, PlateauSize> ParsePlateauSize(string dims)
     {
         if (dims == String.Empty)
         {
-            return Either<PlateauSize>.From(Messages.EmptyInput);
+            return Left(Messages.EmptyInput);
         }
         else if (!(IsValidPlateauDims(dims)))
         {
-            return Either<PlateauSize>.From(Messages.InvalidDimensions(dims));
+            return Left(Messages.InvalidDimensions(dims));
         }
 
         var stringPlateauSizeData = GetPlateauSizeDataFromString(dims);
-        if (stringPlateauSizeData.IsFailure)
-            return Either<PlateauSize>.From(stringPlateauSizeData.Message);
-
-        var (xStr, yStr) = stringPlateauSizeData.Result;
-        Either<int> x = xStr.ToInt();
-        Either<int> y = yStr.ToInt();
-
-        if (x.Value is Success<int> X && y.Value is Success<int> Y)
-        {
-            return Either<PlateauSize>.From(new PlateauSize(X.Value, Y.Value));
+        var x = stringPlateauSizeData.Match<Either<string, (int, int)>>(
+            Left: error => Left(error),
+            Right: size => size.Item1
+                             .ToCharArray()
+                             .Map(c => c.ToCoordinateInt())
+                             .ToSeq()
+                             .Unwrap()
+                             .Match<Either<string, (int, int)>>(
+                Left: error => Left(error),
+                Right: x => )
         }
-        return Either<PlateauSize>.From(Messages.InvalidDimensions(dims));
+        //    Left: error => Left<string, PlateauSize>(error),
+        //    Right: size => Right(size)
+        //)
+        //);
     }
 
     private static Either<(string, string, string)> GetPositionDataFromString(string position)

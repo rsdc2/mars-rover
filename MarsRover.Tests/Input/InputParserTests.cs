@@ -21,7 +21,7 @@ internal class InputParserTests
         string instruction = "";
 
         // Act
-        var result = InputParser.ParseInstruction(instruction);
+        var result = InputParser.ParseInstructions(instruction);
 
         // Assert
         Assert.That(result.Message == Messages.NoInstruction);
@@ -114,7 +114,7 @@ internal class InputParserTests
         string instructions = "TDR";
 
         // Act
-        var result = InputParser.ParseInstruction(instructions);
+        var result = InputParser.ParseInstructions(instructions);
 
         // Assert
         result.Value.Message.Should().Be($"{Messages.CommandsNotCarriedOut}" +
@@ -128,7 +128,7 @@ internal class InputParserTests
         string instruction = "MLR";
 
         // Act
-        var result = InputParser.ParseInstruction(instruction);
+        var result = InputParser.ParseInstructions(instruction);
 
         // Assert
         Assert.That(result.Value is Success<InstructionSet>);

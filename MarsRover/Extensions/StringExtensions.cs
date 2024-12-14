@@ -1,32 +1,42 @@
 ﻿using MarsRover.Data;
-using MarsRover.Types;
+using LanguageExt;
+using static LanguageExt.Prelude;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
+
 
 namespace MarsRover.Extensions;
 
 internal static class StringExtensions
 {
-    internal static Either<int> ToInt(this string s)
+    internal static Either<string, int> ToInt(this string s)
     {
         try
         {
-            return Either<int>.From(int.Parse(s));
+            return Right(int.Parse(s));
         }
         catch (Exception ex)
         {
-            return Either<int>.From(Messages.CannotParseStringToInteger(s, ex.Message));
+            return Left(Messages.CannotParseStringToInteger(s, ex.Message));
         }
     }
 
-    internal static Either<Direction> ToDirection(this string s) 
+    internal static Either<string, Direction> ToDirection(this string s) => s.Length switch
     {
-        if (s.Length > 1) return Either<Direction>.From(Messages.InvalidDirection(s));    
-        if (s.Length == 0) return Either<Direction>.From(Messages.InvalidDirection(s));
+        <= 0 => Left(Messages.InvalidDirection(s)),
+        _ => 
+        if (s.Length > 1) return ;    
+        if (s.Length == 0) return );
 
         return s[0].ToDirection();
+    }
+
+    internal static Either<string, int> ToCoordinate(this string s)
+    {
+
     }
 }

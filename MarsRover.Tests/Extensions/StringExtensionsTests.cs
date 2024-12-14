@@ -4,11 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using LanguageExt;
+using static LanguageExt.Prelude;
+
 using FluentAssertions;
 
 using MarsRover.Extensions;
-using MarsRover.Types;
 using MarsRover.Data;
+using LanguageExt.UnsafeValueAccess;
 
 namespace MarsRover.Tests.Extensions
 {
@@ -21,10 +24,11 @@ namespace MarsRover.Tests.Extensions
         public void StringToIntHappyTest(string input, int expectedOutput)
         {
             // Act
-            Either<int> output = input.ToInt();
+            Either<string, int> output = input.ToInt();
 
             // Assert
-            output.Result.Should().Be(expectedOutput);
+            var val = output.Value();
+            val.Should().Be(expectedOutput);
         }
 
         [Test]
@@ -34,10 +38,10 @@ namespace MarsRover.Tests.Extensions
         public void StringToIntSadTest(string input)
         {
             // Act
-            Either<int> output = input.ToInt();
+            Either<string, int> output = input.ToInt();
 
             // Assert
-            output.IsFailure.Should().BeTrue();
+            output.IsLeft.Should().BeTrue();
         }
 
         [Test]
@@ -48,10 +52,10 @@ namespace MarsRover.Tests.Extensions
         public void StringToDirectionHappyTest(string input, Direction expectedOutput)
         {
             // Act
-            Either<Direction> output = input.ToDirection();
+            Either<string, Direction> output = input.ToDirection();
 
             // Assert
-            output.Result.Should().Be(expectedOutput);
+            output.Value().Should().Be(expectedOutput);
         }
 
         [Test]
@@ -61,10 +65,10 @@ namespace MarsRover.Tests.Extensions
         public void StringToDirectionSadTest(string input)
         {
             // Act
-            Either<Direction> output = input.ToDirection();
+            Either<string, Direction> output = input.ToDirection();
 
             // Assert
-            output.IsFailure.Should().BeTrue();
+            output.IsLeft.Should().BeTrue();
         }
     }
 }

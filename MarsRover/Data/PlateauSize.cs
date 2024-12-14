@@ -12,5 +12,10 @@ namespace MarsRover.Data
         {
             return new PlateauSize(x, y);
         }
+
+        public static PlateauSize From((int, int) size)
+        {
+            return new PlateauSize(size.Item1, size.Item2);
+        }
     }
 }
