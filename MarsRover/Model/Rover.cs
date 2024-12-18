@@ -2,6 +2,7 @@
 using LanguageExt;
 using static LanguageExt.Prelude;
 using System;
+using System.Diagnostics.Contracts;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -50,6 +51,7 @@ namespace MarsRover.Model
             _ => Left(Messages.CannotMoveRover(Id))
         };
 
+        
         /// <summary>
         /// Move the Rover one unit in the direction that it is facing
         /// </summary>
@@ -66,6 +68,7 @@ namespace MarsRover.Model
 
         }
 
+        
         public Either<string, Rover> Rotate(RotateInstruction rotation)
         {
             var directionInt = (int)Direction;

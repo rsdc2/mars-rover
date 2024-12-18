@@ -7,11 +7,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using System.Diagnostics.Contracts;
 
 namespace MarsRover.Extensions;
 
 internal static class CharExtensions
 {
+    [Pure]
     internal static Either<string, Instruction> ToInstruction(this char c) => c switch
     {
         'M' => Right(Instruction.M),
@@ -20,6 +22,7 @@ internal static class CharExtensions
         _ => Left($"{c} {Messages.ParseFailure}")
     };
 
+    [Pure]
     internal static Either<string, Direction> ToDirection(this char c) => c switch
     {
         'N' => Right(Direction.N),
@@ -29,6 +32,7 @@ internal static class CharExtensions
         _ => Left($"{c} {Messages.InvalidDirection(c)}")
     };
 
+    [Pure]
     internal static Either<string, int> ToCoordinateInt(this char c) => c switch
     {
         '0' => Right(0),
