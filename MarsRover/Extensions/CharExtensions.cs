@@ -36,12 +36,25 @@ internal static class CharExtensions
         '2' => Right(2),
         '3' => Right(3),
         '4' => Right(4),
+        '5' => Right(5),
+        '6' => Right(6),
+        '7' => Right(7),
+        '8' => Right(8),
+        '9' => Right(9),
         _ => Left($"{c} {Messages.InvalidCoordinate(c)}")
     };
 
-    internal static Either<string, char> ToCoordinateStr(this char c) => Regex.IsMatch($"{c}", @"^[0-9]+$") switch
+    internal static Either<string, char> ToCoordinateChar(this char c) => 
+        Regex.IsMatch($"{c}", @"^[0-9]+$") switch
     {
         true => Right(c),
         false => Left(Messages.InvalidCoordinate(c))
     };
+
+    internal static Either<string, string> ToCoordinateStr(this char c) =>
+        Regex.IsMatch($"{c}", @"^[0-9]+$") switch
+        {
+            true => Right($"{c}"),
+            false => Left(Messages.InvalidCoordinate(c))
+        };
 }

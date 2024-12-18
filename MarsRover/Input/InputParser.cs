@@ -75,16 +75,7 @@ internal static partial class InputParser
         }
 
         var stringPlateauSizeData = GetPlateauSizeDataFromString(dims);
-        var x = stringPlateauSizeData.Match<Either<string, (int, int)>>(
-            Left: error => Left(error),
-            Right: size => size.Item1
-                             .ToCharArray()
-                             .Map(c => c.ToCoordinateInt())
-                             .ToSeq()
-                             .Unwrap()
-                             .Match<Either<string, (int, int)>>(
-                Left: error => Left(error),
-                Right: x => )
+        var x = stringPlateauSizeData.Bind<((string x, string y) => Right(x.ToCoordinate(), y.ToCoordinate()));
         }
         //    Left: error => Left<string, PlateauSize>(error),
         //    Right: size => Right(size)

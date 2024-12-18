@@ -27,16 +27,18 @@ internal static class StringExtensions
 
     internal static Either<string, Direction> ToDirection(this string s) => s.Length switch
     {
-        <= 0 => Left(Messages.InvalidDirection(s)),
-        _ => 
-        if (s.Length > 1) return ;    
-        if (s.Length == 0) return );
+        0    => Left(Messages.NoInstruction),
+        1    => s[0].ToDirection(),
+        _    => Left(Messages.InvalidDirection(s))
+    };
 
-        return s[0].ToDirection();
-    }
-
-    internal static Either<string, int> ToCoordinate(this string s)
-    {
-
-    }
+    internal static Either<string, int> ToCoordinate(this string s) =>
+        s.Aggregate(
+            (Either<string, string>)Right(""), (acc, c) =>
+                acc.Bind(coords => c.ToCoordinateStr().Bind<string>(coord => Right(coords + coord)))
+        ).Bind(coords => coords.ToInt());
 }
+//return acc.Match<Either<string, string>>(
+//    Left: error => Left(error),
+//    Right: coordStr => Right(coordStr + coord)
+//); 
