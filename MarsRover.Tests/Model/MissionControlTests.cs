@@ -25,8 +25,8 @@ namespace MarsRover.Tests.Model
             var updatedMissionControl = missionControl.AddRover(rover);
 
             // Assert
-            updatedMissionControl.Value.Value.Rovers.Count.Should().Be(1);
-            missionControl.Rovers.Count.Should().Be(1);
+            Assert.That(updatedMissionControl.IsRight);
+            updatedMissionControl.IfRight(mc => mc.Rovers.Count.Should().Be(1));
         }
 
         [Test, Description("Test that can add plateau successfully")]
@@ -41,7 +41,8 @@ namespace MarsRover.Tests.Model
             var updatedMissionControl = missionControl.AddPlateau(plateau);
 
             // Assert
-            updatedMissionControl.Result.Plateau.Should().NotBeNull();
+            Assert.That(updatedMissionControl.IsRight);
+            updatedMissionControl.IfRight(mc => mc.Plateau.Should().NotBeNull());
         }
 
         [Test, Description("Test that can find rover with Id")]
@@ -57,7 +58,7 @@ namespace MarsRover.Tests.Model
             var foundRover = missionControl.GetRoverById(Rover.RoverCount);
 
             // Assert
-            foundRover.IsSuccess.Should().BeTrue();
+            Assert.That(foundRover.IsRight);
         }
 
 
@@ -71,7 +72,7 @@ namespace MarsRover.Tests.Model
             var foundRover = missionControl.GetRoverById(1);
 
             // Assert
-            foundRover.IsFailure.Should().BeTrue();
+            Assert.That(foundRover.IsLeft);
         }
 
         [Test, Description("Test that mission control can move a rover sucessfully")]
@@ -99,8 +100,9 @@ namespace MarsRover.Tests.Model
             var rotatedRover = missionControl.MoveRover(Rover.RoverCount);
 
             // Assert
-            rotatedRover.Result.Position.X.Should().Be(expectedX);
-            rotatedRover.Result.Position.Y.Should().Be(expectedY);
+            rotatedRover.IsRight.Should().BeTrue();
+            rotatedRover.IfRight(rover => rover.Position.X.Should().Be(expectedX));
+            rotatedRover.IfRight(rover => rover.Position.Y.Should().Be(expectedY));
         }
 
         [Test, Description("Test that returns failure if moves to an impossible location")]
@@ -128,7 +130,7 @@ namespace MarsRover.Tests.Model
             var movedRover = missionControl.MoveRover(Rover.RoverCount);
 
             // Assert
-            Assert.That(movedRover.Value is Failure<Rover>);
+            movedRover.IsLeft.Should().BeTrue();
         }
 
 
@@ -155,7 +157,9 @@ namespace MarsRover.Tests.Model
             var rotatedRover = missionControl.RotateRover(Rover.RoverCount, rotation);
 
             // Assert
-            rotatedRover.Value.Value.Direction.Should().Be(expectedDirection);
+            Assert.That(rotatedRover.IsRight);
+            rotatedRover.IfRight(rover => rover.Direction.Should().Be(expectedDirection));
+
         }
 
     }

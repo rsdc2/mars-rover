@@ -32,7 +32,8 @@ namespace MarsRover.Tests.Model
             var roverWithNewDirection = rover.Rotate(rotation);
 
             // Assert
-            roverWithNewDirection.Value.Value.Direction.Should().Be(finalDirection);
+            Assert.That(roverWithNewDirection.IsRight);
+            roverWithNewDirection.IfRight(rover => rover.Direction.Should().Be(finalDirection));
         }
 
         [Test, Description("Test that can move the rover one position forwards in the direction that it is facing")]
@@ -56,8 +57,9 @@ namespace MarsRover.Tests.Model
             var newPosition = rover.Move();
 
             // Assert
-            newPosition.Result.X.Should().Be(expectedX);
-            newPosition.Result.Y.Should().Be(expectedY);
+            Assert.That(newPosition.IsRight);
+            newPosition.IfRight(pos => pos.X.Should().Be(expectedX));
+            newPosition.IfRight(pos => pos.Y.Should().Be(expectedY));
         }
     
 
@@ -78,7 +80,7 @@ namespace MarsRover.Tests.Model
             var newPosition = rover.Move();
 
             // Assert
-            Assert.That(newPosition.Value is Failure<Rover>);
+            Assert.That(newPosition.IsLeft);
         }
     }
 

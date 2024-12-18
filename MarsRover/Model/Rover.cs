@@ -1,5 +1,6 @@
 ﻿using MarsRover.Data;
-using MarsRover.Types;
+using LanguageExt;
+using static LanguageExt.Prelude;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,59 +39,55 @@ namespace MarsRover.Model
         /// Get new position of the rover when it moves one block in the direction that it is facing
         /// </summary>
         /// <returns></returns>
-        public Either<RoverPosition> GetNewPosition() => Position.Triple switch
+        public Either<string, RoverPosition> GetNewPosition() => Position.Triple switch
         {
-            (_, 0, Direction.S) => Either<RoverPosition>.From(Messages.CannotMoveRover(Id)),
-            (0, _, Direction.W) => Either<RoverPosition>.From(Messages.CannotMoveRover(Id)),
-            (_, _, Direction.E) => Either<RoverPosition>.From(Position with { X = Position.X + 1 }),
-            (_, _, Direction.W) => Either<RoverPosition>.From(Position with { X = Position.X - 1 }),
-            (_, _, Direction.N) => Either<RoverPosition>.From(Position with { Y = Position.Y + 1 }),
-            (_, _, Direction.S) => Either<RoverPosition>.From(Position with { Y = Position.Y - 1 }),
-            _ => Either<RoverPosition>.From(Messages.CannotMoveRover(Id))
+            (_, 0, Direction.S) => Left(Messages.CannotMoveRover(Id)),
+            (0, _, Direction.W) => Left(Messages.CannotMoveRover(Id)),
+            (_, _, Direction.E) => Right(Position with { X = Position.X + 1 }),
+            (_, _, Direction.W) => Right(Position with { X = Position.X - 1 }),
+            (_, _, Direction.N) => Right(Position with { Y = Position.Y + 1 }),
+            (_, _, Direction.S) => Right(Position with { Y = Position.Y - 1 }),
+            _ => Left(Messages.CannotMoveRover(Id))
         };
 
         /// <summary>
         /// Move the Rover one unit in the direction that it is facing
         /// </summary>
         /// <returns></returns>
-        public Either<Rover> Move()
+        public Either<string, Rover> Move()
         {
             var newPosition = GetNewPosition();
-            if (newPosition.Value is Success<RoverPosition> success)
-            {
-                Position = success.Value;
-                return Either<Rover>.From(this);
-            }
+            newPosition.IfRight(position => Position = position);
 
-            return Either<Rover>.From(newPosition.Message);
+            return newPosition.Match<Either<string, Rover>>(
+                Left: error => Left(error),
+                Right: _ => Right(this)
+            );
+
         }
 
-        public Either<Rover> Rotate(RotateInstruction rotation)
+        public Either<string, Rover> Rotate(RotateInstruction rotation)
         {
             var directionInt = (int)Direction;
             var rotationInt = (int)rotation;
 
             var newDirection = (Direction)((4 + directionInt + rotationInt) % 4);
             Position = Position with { Direction = newDirection };
-            return Either<Rover>.From(this);
+            return Right(this);
         }
-        public Either<Rover> UpdateX(int x)
+        public Either<string, Rover> UpdateX(int x)
         {
-            if (x < 0)
-            {
-                return Either<Rover>.From(Messages.CannotMoveRover(Id));
-            }
+            if (x < 0) return Left(Messages.CannotMoveRover(Id));
             Position = Position with { X = x };
-            return Either<Rover>.From(this);
+            return Right(this);
         }
-        public Either<Rover> UpdateY(int y)
+        public Either<string, Rover> UpdateY(int y)
         {
             if (y < 0)
-            {
-                return Either<Rover>.From(Messages.CannotMoveRover(Id));
-            }
+                return Left(Messages.CannotMoveRover(Id));
+
             Position = Position with { Y = y };
-            return Either<Rover>.From(this);
+            return Right(this);
         }
 
         public string Description()

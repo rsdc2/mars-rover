@@ -18,5 +18,11 @@ namespace MarsRover.Data
         {
             return new RoverPosition(x, y, direction);
         }
+
+        public static RoverPosition From((int, int, Direction) triple)
+        {
+            var (x, y, direction) = triple;
+            return new RoverPosition(x, y, direction);
+        }
     };
 }

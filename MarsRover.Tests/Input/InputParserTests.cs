@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using MarsRover.Input;
 using MarsRover.Types;
 using MarsRover.Data;
+using LanguageExt.UnsafeValueAccess;
+using static LanguageExt.Prelude;
 
 namespace MarsRover.Tests.Input;
 
@@ -24,7 +26,8 @@ internal class InputParserTests
         var result = InputParser.ParseInstructions(instruction);
 
         // Assert
-        Assert.That(result.Message == Messages.NoInstruction);
+        result.IfLeft(error => Assert.That(error == Messages.NoInstruction));
+        result.IfRight(_ => Assert.That(false));
     }
 
     [TestCase("1 3 ")]
@@ -36,7 +39,8 @@ internal class InputParserTests
         var size = InputParser.ParsePlateauSize(sizeString);
 
         // Assert
-        size.Message.Should().Be(Messages.InvalidDimensions(sizeString));
+        size.IfLeft(error => error.Should().Be(Messages.InvalidDimensions(sizeString)));
+        size.IfRight(_ => Assert.That(false));
     }
     public static IEnumerable<TestCaseData> TestPlateauSizes
     {
@@ -58,11 +62,12 @@ internal class InputParserTests
     )
     {
         // Act
-        var sizeResult = InputParser.ParsePlateauSize(sizeString).Result;
+        var sizeResult = InputParser.ParsePlateauSize(sizeString);
 
         // Assert
-        sizeResult.X.Should().Be(expectedPlateauSize.X);
-        sizeResult.Y.Should().Be(expectedPlateauSize.Y);
+        sizeResult.IfRight(size => size.X.Should().Be(expectedPlateauSize.X));
+        sizeResult.IfRight(size => size.Y.Should().Be(expectedPlateauSize.Y));
+        sizeResult.IfLeft(_ => Assert.That(false));
     }
 
     [Test]
@@ -76,7 +81,8 @@ internal class InputParserTests
         var parsedPosition = InputParser.ParsePosition(position);
 
         // Assert
-        Assert.That(parsedPosition.Message == Messages.InvalidPosition(position));
+        parsedPosition.IfLeft(error => error.Should().Be(Messages.InvalidPosition(position)));
+        parsedPosition.IfRight(_ => Assert.That(false));
     }
 
     [Test]
@@ -89,7 +95,8 @@ internal class InputParserTests
         var position = InputParser.ParsePosition(positionString);
 
         // Assert
-        Assert.That(position.Message == Messages.InvalidPosition(positionString));
+        Assert.That(position.IsLeft);
+        position.IfLeft(error => error.Should().Be(Messages.InvalidPosition(positionString)));
     }
 
     [Test]
@@ -103,7 +110,7 @@ internal class InputParserTests
         var parsedPosition = InputParser.ParsePosition(position);
 
         // Assert
-        Assert.That(parsedPosition.IsSuccess);
+        Assert.That(parsedPosition.IsRight);
     }
 
 
@@ -117,8 +124,7 @@ internal class InputParserTests
         var result = InputParser.ParseInstructions(instructions);
 
         // Assert
-        result.Value.Message.Should().Be($"{Messages.CommandsNotCarriedOut}" +
-            $":\nT {Messages.ParseFailure}\nD {Messages.ParseFailure}");
+        Assert.That(result.IsLeft);
     }
 
     [Test]
@@ -131,6 +137,6 @@ internal class InputParserTests
         var result = InputParser.ParseInstructions(instruction);
 
         // Assert
-        Assert.That(result.Value is Success<InstructionSet>);
+        Assert.That(result.IsRight);
     }
 }

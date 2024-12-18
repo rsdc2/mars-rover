@@ -1,5 +1,4 @@
 ﻿using MarsRover.Data;
-using MarsRover.Types;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,6 +6,8 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LanguageExt;
+using static LanguageExt.Prelude;
 
 namespace MarsRover.Model;
 
@@ -23,14 +24,14 @@ internal class Plateau(PlateauSize plateauSize)
         return new Plateau(size);
     }
 
-    public static Either<Plateau> From(int x, int y)
+    public static Either<string, Plateau> From(int x, int y)
     {
-        return Either<Plateau>.From(FromInts(x, y));
+        return Right(FromInts(x, y));
     }
 
-    public static Either<Plateau> FromPlateauSize(PlateauSize plateauSize)
+    public static Either<string, Plateau> FromPlateauSize(PlateauSize plateauSize)
     {
-        return Either<Plateau>.From(new Plateau(plateauSize));
+        return Right(new Plateau(plateauSize));
     }
 
 }

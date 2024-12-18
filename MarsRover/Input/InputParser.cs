@@ -22,11 +22,7 @@ internal static partial class InputParser
         return regex.IsMatch(instruction);
     }
 
-    public static bool IsValidPlateauDims(string dims)
-    {
-        var regex = PlateauSizeRegex();
-        return regex.IsMatch(dims);
-    }
+    public static bool IsValidPlateauDims(string dims) => PlateauSizeRegex().IsMatch(dims);
 
     public static bool IsValidPosition(string position)
     {
@@ -63,27 +59,27 @@ internal static partial class InputParser
         }
     }
 
+    /// <summary>
+    /// Return a PlateauSize object from a string containing the dimensions of the plateau
+    /// </summary>
+    /// <param name="dims">A string provided in the format "n+ n+"</param>
+    /// <returns></returns>
     public static Either<string, PlateauSize> ParsePlateauSize(string dims)
     {
-        if (dims == String.Empty)
-        {
+        if (dims == String.Empty) 
             return Left(Messages.EmptyInput);
-        }
         else if (!(IsValidPlateauDims(dims)))
-        {
             return Left(Messages.InvalidDimensions(dims));
-        }
 
         var stringPlateauSizeData = GetPlateauSizeDataFromString(dims);
-        var x = stringPlateauSizeData.Bind<((string x, string y) => Right(x.ToCoordinate(), y.ToCoordinate()));
-        }
-        //    Left: error => Left<string, PlateauSize>(error),
-        //    Right: size => Right(size)
-        //)
-        //);
+        var x = stringPlateauSizeData.Bind(pair => pair.Item1.ToCoordinate());
+        var y = stringPlateauSizeData.Bind(pair => pair.Item2.ToCoordinate());
+
+        return x.Bind(x => y.Bind<(int, int)>(y => (x, y)))
+                .Map(PlateauSize.From);
     }
 
-    private static Either<(string, string, string)> GetPositionDataFromString(string position)
+    private static Either<string, (string, string, string)> GetPositionDataFromString(string position)
     {
         try
         {
@@ -94,38 +90,28 @@ internal static partial class InputParser
             var y = groups[2].Value;
             var direction = groups[3].Value;
 
-            return Either<(string, string, string)>.From((x, y, direction));
+            return Right((x, y, direction));
         }
         catch (Exception ex)
         {
-            return Either<(string, string, string)>
-               .From(Messages.CannotGetPositionDataFromString(position, ex.Message));
+            return Left(Messages.CannotGetPositionDataFromString(position, ex.Message));
         }
     }
-
-    public static Either<RoverPosition> ParsePosition(string position)
+    
+    public static Either<string, RoverPosition> ParsePosition(string position)
     {
         if (position == String.Empty)
-        {
-            return Either<RoverPosition>.From(Messages.NoPosition);
-        }
+            return Left(Messages.NoPosition);
         else if (!(IsValidPosition(position)))
-            return Either<RoverPosition>.From(Messages.InvalidPosition(position));
+            return Left(Messages.InvalidPosition(position));
 
         var stringPositionData = GetPositionDataFromString(position);
-        if (stringPositionData.IsFailure) 
-            return Either<RoverPosition>.From(stringPositionData.Message);
+        var x = stringPositionData.Bind(triple => triple.Item1.ToCoordinate());
+        var y = stringPositionData.Bind(triple => triple.Item2.ToCoordinate());
+        var direction = stringPositionData.Bind(triple => triple.Item3.ToDirection());
 
-        var (xStr, yStr, dStr) = stringPositionData.Result;
-        Either<int> x = xStr.ToInt();
-        Either<int> y = yStr.ToInt();
-        Either<Direction> d = dStr.ToDirection();
-
-        if (x.Value is Success<int> X && y.Value is Success<int> Y && d.Value is Success<Direction> D)
-        {
-            return Either<RoverPosition>.From(new RoverPosition(X.Value, Y.Value, D.Value));
-        }
-        return Either<RoverPosition>.From(Messages.InvalidPosition(position));
+        return x.Bind(x => y.Bind(y => direction.Bind<(int, int, Direction)>(d => Right((x, y, d)))))
+                .Map(RoverPosition.From);
     }
 
     [GeneratedRegex(@"[LRM]+")]

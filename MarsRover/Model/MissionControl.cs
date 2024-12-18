@@ -1,5 +1,6 @@
 ﻿using MarsRover.Data;
-using MarsRover.Types;
+using LanguageExt;
+using static LanguageExt.Prelude;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +14,10 @@ namespace MarsRover.Model
         public List<Rover> Rovers { get; private set; } = [];
         public Plateau Plateau { get; private set; } = Plateau.FromInts(0, 0);
         public MissionControl() { }
-        public Either<MissionControl> AddPlateau(Plateau plateau)
+        public Either<string, MissionControl> AddPlateau(Plateau plateau)
         {
             Plateau = plateau;
-            return Either<MissionControl>.From(this);
+            return Right(this);
         }
 
         /// <summary>
@@ -24,50 +25,50 @@ namespace MarsRover.Model
         /// </summary>
         /// <param name="rover">A new Rover to add</param>
         /// <returns>An Either of the updated MissionControl</returns>
-        public Either<MissionControl> AddRover(Rover rover)
+        public Either<string, MissionControl> AddRover(Rover rover)
         {
             Rovers.Add(rover);
-            return Either<MissionControl>.From(this);
+            return Right(this);
         }
 
-        public Either<MissionControl> AddRover(RoverPosition position)
+        public Either<string, MissionControl> AddRover(RoverPosition position)
         {
             var rover = new Rover(position);
             Rovers.Add(rover);
-            return Either<MissionControl>.From(this);
+            return Right(this);
         }
 
-        public static Either<MissionControl> FromPlateau(Plateau plateau)
+        public static Either<string, MissionControl> FromPlateau(Plateau plateau)
         {
             var missionControl = new MissionControl();
             missionControl.AddPlateau(plateau);
-            return Either<MissionControl>.From(missionControl);
+            return Right(missionControl);
         }
 
-        public Either<Rover> GetRoverById(int roverId) =>
+        public Either<string, Rover> GetRoverById(int roverId) =>
             Rovers.Where(rover => rover.Id == roverId).ToList().Count switch
             {
-                0 => Either<Rover>.From(Messages.RoverDoesNotExist(roverId)),
-                1 => Either<Rover>.From(Rovers.Where(rover => rover.Id == roverId).First()),
-                _ => Either<Rover>.From(Messages.MoreThanOneRoverWithId(roverId))
+                0 => Left(Messages.RoverDoesNotExist(roverId)),
+                1 => Right(Rovers.Where(rover => rover.Id == roverId).First()),
+                _ => Left(Messages.MoreThanOneRoverWithId(roverId))
             };
 
-        public Either<Rover> MoveRover(int roverId)
+        public Either<string, Rover> MoveRover(int roverId)
         {
             return GetRoverById(roverId)
                 .Bind(MoveRover);   
         }
-        public Either<Rover> MoveRover(Rover rover) {
+        public Either<string, Rover> MoveRover(Rover rover) {
             switch (rover.Position)
             {
                 case RoverPosition(_, 0, Direction.S):
-                    return Either<Rover>.From(Messages.CannotMoveRover(rover.Id));
+                    return Left(Messages.CannotMoveRover(rover.Id));
 
                 case RoverPosition(_, _, Direction.S):
                     return rover.UpdateY(rover.Position.Y - 1);
 
                 case RoverPosition(0, _, Direction.W):
-                    return Either<Rover>.From(Messages.CannotMoveRover(rover.Id));
+                    return Left(Messages.CannotMoveRover(rover.Id));
 
                 case RoverPosition(_, _, Direction.W):
                     return rover.UpdateX(rover.Position.X - 1);
@@ -75,21 +76,21 @@ namespace MarsRover.Model
                 case RoverPosition(_, _, Direction.N):
                     if (rover.Position.Y >= Plateau.MaxY)
                     {
-                        return Either<Rover>.From(Messages.CannotMoveRover(rover.Id));
+                        return Left(Messages.CannotMoveRover(rover.Id));
                     }
                     return rover.UpdateY(rover.Position.Y + 1);
 
                 case RoverPosition(_, _, Direction.E):
                     if (rover.Position.X >= Plateau.MaxX)
                     {
-                        return Either<Rover>.From(Messages.CannotMoveRover(rover.Id));
+                        return Left(Messages.CannotMoveRover(rover.Id));
                     }
                     return rover.UpdateX(rover.Position.X + 1);
 
             }
-            return Either<Rover>.From(Messages.Unforeseen);
+            return Left(Messages.Unforeseen);
         }
-        public Either<Rover> RotateRover(int roverId, RotateInstruction rotation)
+        public Either<string, Rover> RotateRover(int roverId, RotateInstruction rotation)
         {
             return GetRoverById(roverId).Bind(rover => rover.Rotate(rotation));
         }

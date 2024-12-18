@@ -5,7 +5,6 @@
 namespace MarsRover;
 using MarsRover.Input;
 using MarsRover.Model;
-using MarsRover.Types;
 using MarsRover.Data;
 
 internal class Program
@@ -26,18 +25,17 @@ internal class Program
             .Bind(Plateau.FromPlateauSize)
             .Bind(MissionControl.FromPlateau)
             .Bind(control => initialPosition1.Bind(pos => control.AddRover(pos)))
-            .Bind(control => initialPosition2.Bind(pos => control.AddRover(pos)))
-            .Result;
+            .Bind(control => initialPosition2.Bind(pos => control.AddRover(pos)));
 
-        Console.WriteLine(missionControl.Description());
+        missionControl.IfRight(mc => Console.WriteLine(mc.Description()));
 
-        missionControl.MoveRover(1);
+        var rover11 = missionControl.Bind(mc => mc.MoveRover(1));
         Console.WriteLine();
-        Console.WriteLine(missionControl.Description());
+        missionControl.IfRight(mc => Console.WriteLine(mc.Description()));
 
-        missionControl.RotateRover(2, RotateInstruction.L);
+        var rover2 = missionControl.Bind(mc => mc.RotateRover(2, RotateInstruction.L));
         Console.WriteLine();
-        Console.WriteLine(missionControl.Description());
+        missionControl.IfRight(mc => Console.WriteLine(mc.Description()));
     }
 
     static void Sad()
@@ -48,20 +46,15 @@ internal class Program
         var plateauSize = InputParser.ParsePlateauSize(plateauSizeInput);
         var initialPosition1 = InputParser.ParsePosition(initialPosition1Input);
 
-        //var missionControl = plateauSize.Fmap(size => new Plateau(size));
-
         var missionControl = plateauSize
             .Bind(Plateau.FromPlateauSize)
             .Bind(MissionControl.FromPlateau)
-            .Bind(control => initialPosition1.Bind(pos => control.AddRover(pos)))
-            .Result;
+            .Bind(control => initialPosition1.Bind(pos => control.AddRover(pos)));
 
-        Console.WriteLine(missionControl.Description());
+        missionControl.IfRight(mc => Console.WriteLine(mc.Description()));
 
-        Console.WriteLine(missionControl.Description());
-
-        Either<Rover> result = missionControl.MoveRover(1);
-        Console.WriteLine(result.Message);
+        var result = missionControl.Bind(mc => mc.MoveRover(1));
+        result.IfLeft(Console.WriteLine);
     }
 
     static void Main(string[] args)
