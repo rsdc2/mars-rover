@@ -19,13 +19,15 @@ internal class Program
         var initialPosition1 = InputParser.ParsePosition(initialPosition1Input);
         var initialPosition2 = InputParser.ParsePosition(initialPosition2Input);
 
-        //var missionControl = plateauSize.Fmap(size => new Plateau(size));
-
-        var missionControl = plateauSize
-            .Bind(Plateau.FromPlateauSize)
-            .Bind(MissionControl.FromPlateau)
-            .Bind(control => initialPosition1.Bind(pos => control.AddRover(pos)))
-            .Bind(control => initialPosition2.Bind(pos => control.AddRover(pos)));
+        var missionControl =
+            from plateauSize_ in plateauSize
+            from plateau in Plateau.FromPlateauSize(plateauSize_)
+            from mc in MissionControl.FromPlateau(plateau)
+            from pos1 in initialPosition1
+            from pos2 in initialPosition2
+            from mc2 in mc.AddRover(pos1)
+            from mc3 in mc.AddRover(pos2)
+            select mc3;
 
         missionControl.IfRight(mc => Console.WriteLine(mc.Description()));
 
@@ -59,7 +61,7 @@ internal class Program
 
     static void Main(string[] args)
     {
-        //Happy();
-        Sad();
+        Happy();
+        //Sad();
     }
 }
