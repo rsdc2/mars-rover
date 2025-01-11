@@ -71,12 +71,10 @@ internal static partial class InputParser
         else if (!(IsValidPlateauDims(dims)))
             return Left(Messages.InvalidDimensions(dims));
 
-        var stringPlateauSizeData = GetPlateauSizeDataFromString(dims);
-        var x = stringPlateauSizeData.Bind(pair => pair.Item1.ToCoordinate());
-        var y = stringPlateauSizeData.Bind(pair => pair.Item2.ToCoordinate());
-
-        return x.Bind(x => y.Bind<(int, int)>(y => (x, y)))
-                .Map(PlateauSize.From);
+        return from xy in GetPlateauSizeDataFromString(dims)
+               from x in xy.Item1.ToCoordinate()
+               from y in xy.Item2.ToCoordinate()
+               select PlateauSize.From(x, y);
     }
 
     private static Either<string, (string, string, string)> GetPositionDataFromString(string position)
