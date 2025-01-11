@@ -10,6 +10,11 @@ namespace MarsRover.Data;
 
 internal static class Messages
 {
+    public static string GetPlateauSize = "Please enter plateau dimensions, e.g. '5 5':";
+    public static string GetInitialPosition = "Please enter an initial position and a facing direction, e.g. '5 5 N':";
+    public static string GetInstructions = "Please enter an instruction:";
+
+
     public static string CannotAddPlateau = "Cannot add plateau";
     public static string CannotAddRover = "Cannot add Rover";
     public static string CommandsNotCarriedOut = "Commands not carried out";

@@ -6,14 +6,19 @@ namespace MarsRover;
 using MarsRover.Input;
 using MarsRover.Model;
 using MarsRover.Data;
+using MarsRover.UI;
 
 internal class Program
 {
     static void Happy()
     {
-        string plateauSizeInput = "5 5";
-        string initialPosition1Input = "1 2 N";
-        string initialPosition2Input = "3 3 E";
+        //string plateauSizeInput = "5 5";
+        //string initialPosition1Input = "1 2 N";
+        //string initialPosition2Input = "3 3 E";
+
+        string? plateauSizeInput = ConsoleUI.GetPlateauSize();
+        string? initialPosition1Input = ConsoleUI.GetInitialPosition();
+        string? initialPosition2Input = ConsoleUI.GetInitialPosition();
 
         var plateauSize = InputParser.ParsePlateauSize(plateauSizeInput);
         var initialPosition1 = InputParser.ParsePosition(initialPosition1Input);

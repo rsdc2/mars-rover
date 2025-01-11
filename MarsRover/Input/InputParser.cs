@@ -64,9 +64,9 @@ internal static partial class InputParser
     /// </summary>
     /// <param name="dims">A string provided in the format "n+ n+"</param>
     /// <returns></returns>
-    public static Either<string, PlateauSize> ParsePlateauSize(string dims)
+    public static Either<string, PlateauSize> ParsePlateauSize(string? dims)
     {
-        if (dims == String.Empty) 
+        if (dims == String.Empty || dims == null) 
             return Left(Messages.EmptyInput);
         else if (!(IsValidPlateauDims(dims)))
             return Left(Messages.InvalidDimensions(dims));
@@ -98,9 +98,9 @@ internal static partial class InputParser
         }
     }
     
-    public static Either<string, RoverPosition> ParsePosition(string position)
+    public static Either<string, RoverPosition> ParsePosition(string? position)
     {
-        if (position == String.Empty)
+        if (position == String.Empty || position == null)
             return Left(Messages.NoPosition);
         else if (!(IsValidPosition(position)))
             return Left(Messages.InvalidPosition(position));
