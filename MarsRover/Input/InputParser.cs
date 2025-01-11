@@ -105,13 +105,11 @@ internal static partial class InputParser
         else if (!(IsValidPosition(position)))
             return Left(Messages.InvalidPosition(position));
 
-        var stringPositionData = GetPositionDataFromString(position);
-        var x = stringPositionData.Bind(triple => triple.Item1.ToCoordinate());
-        var y = stringPositionData.Bind(triple => triple.Item2.ToCoordinate());
-        var direction = stringPositionData.Bind(triple => triple.Item3.ToDirection());
-
-        return x.Bind(x => y.Bind(y => direction.Bind<(int, int, Direction)>(d => Right((x, y, d)))))
-                .Map(RoverPosition.From);
+        return from triple in GetPositionDataFromString(position)
+               from x in triple.Item1.ToCoordinate()
+               from y in triple.Item2.ToCoordinate()
+               from d in triple.Item3.ToDirection()
+               select RoverPosition.From(x, y, d);
     }
 
     [GeneratedRegex(@"[LRM]+")]

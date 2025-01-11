@@ -34,8 +34,13 @@ internal static class StringExtensions
 
     internal static Either<string, int> ToCoordinate(this string s) =>
         s.Aggregate(
-            (Either<string, string>)Right(""), (acc, c) =>
+           (Either<string, string>)Right(""), (acc, c) =>
                 acc.Bind(coords => c.ToCoordinateStr()
                                     .Bind<string>(coord => Right(coords + coord)))
         ).Bind(coords => coords.ToInt());
+
+        //s.Aggregate((Either<string, string>)Right(""), (acc, c) => 
+        //    from coord in c.ToCoordinateStr()
+        //    from coord in Right(coords + coord)
+        //)
 }
