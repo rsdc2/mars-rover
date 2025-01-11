@@ -1,29 +1,35 @@
 ﻿using MarsRover.Data;
+using MarsRover.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using LanguageExt;
+
 namespace MarsRover.UI
 {
     internal class ConsoleUI
     {
-        public static string? GetPlateauSize()
+        public static Either<string, PlateauSize> GetPlateauSize()
         {
             Console.WriteLine(Messages.GetPlateauSize);
-            return Console.ReadLine();
+            var plateauSizeInput = Console.ReadLine();
+            return InputParser.ParsePlateauSize(plateauSizeInput);
         }
-        public static string? GetUserInstructions()
+        public static Either<string, Seq<Instruction>> GetUserInstructions()
         {
             Console.WriteLine(Messages.GetInstructions);
-            return Console.ReadLine();
+            var userInstructions = Console.ReadLine();
+            return InputParser.ParseInstructions(userInstructions);
         }
 
-        public static string? GetInitialPosition()
+        public static Either<string, RoverPosition> GetInitialPosition()
         {
             Console.WriteLine(Messages.GetInitialPosition);
-            return Console.ReadLine();
+            var initialPositionInput = Console.ReadLine();
+            return InputParser.ParsePosition(initialPositionInput);
         }
     }
 }

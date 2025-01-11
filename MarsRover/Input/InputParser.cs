@@ -30,9 +30,9 @@ internal static partial class InputParser
         return regex.IsMatch(position);
     }
 
-    public static Either<string, Seq<Instruction>> ParseInstructions(string instructionString)
+    public static Either<string, Seq<Instruction>> ParseInstructions(string? instructionString)
     {
-        if (instructionString == String.Empty) 
+        if (instructionString == String.Empty || instructionString == null) 
             return Left(Messages.NoInstruction);
 
         return instructionString

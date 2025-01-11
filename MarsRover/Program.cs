@@ -12,24 +12,12 @@ internal class Program
 {
     static void Happy()
     {
-        //string plateauSizeInput = "5 5";
-        //string initialPosition1Input = "1 2 N";
-        //string initialPosition2Input = "3 3 E";
-
-        string? plateauSizeInput = ConsoleUI.GetPlateauSize();
-        string? initialPosition1Input = ConsoleUI.GetInitialPosition();
-        string? initialPosition2Input = ConsoleUI.GetInitialPosition();
-
-        var plateauSize = InputParser.ParsePlateauSize(plateauSizeInput);
-        var initialPosition1 = InputParser.ParsePosition(initialPosition1Input);
-        var initialPosition2 = InputParser.ParsePosition(initialPosition2Input);
-
         var missionControl =
-            from plateauSize_ in plateauSize
-            from plateau in Plateau.FromPlateauSize(plateauSize_)
+            from ps in ConsoleUI.GetPlateauSize()
+            from plateau in Plateau.FromPlateauSize(ps)
             from mc in MissionControl.FromPlateau(plateau)
-            from pos1 in initialPosition1
-            from pos2 in initialPosition2
+            from pos1 in ConsoleUI.GetInitialPosition()
+            from pos2 in ConsoleUI.GetInitialPosition()
             from mc2 in mc.AddRover(pos1)
             from mc3 in mc.AddRover(pos2)
             select mc3;
