@@ -6,5 +6,4 @@ The main project, `MarsRover` has one dependency:
 
 The test project depends on:
 - [NUnit](https://github.com/nunit/nunit) ([MIT](https://github.com/nunit/nunit?tab=MIT-1-ov-file#readme))
-- [FluentAssertions]([Apache 2.0](https://github.com/fluentassertions/fluentassertions?tab=Apache-2.0-1-ov-file#readme))
 - [Coverlet](https://github.com/coverlet-coverage/) ([MIT](https://github.com/coverlet-coverage/coverlet?tab=License-1-ov-file))
