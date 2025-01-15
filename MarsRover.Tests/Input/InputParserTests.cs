@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +38,7 @@ internal class InputParserTests
         var size = InputParser.ParsePlateauSize(sizeString);
 
         // Assert
-        size.IfLeft(error => error.Should().Be(Messages.InvalidDimensions(sizeString)));
+        size.IfLeft(error => Assert.That(error, Is.EqualTo(Messages.InvalidDimensions(sizeString))));
         size.IfRight(_ => Assert.That(false));
     }
     public static IEnumerable<TestCaseData> TestPlateauSizes
@@ -65,8 +64,8 @@ internal class InputParserTests
         var sizeResult = InputParser.ParsePlateauSize(sizeString);
 
         // Assert
-        sizeResult.IfRight(size => size.X.Should().Be(expectedPlateauSize.X));
-        sizeResult.IfRight(size => size.Y.Should().Be(expectedPlateauSize.Y));
+        sizeResult.IfRight(size => Assert.That(size.X, Is.EqualTo(expectedPlateauSize.X)));
+        sizeResult.IfRight(size => Assert.That(size.Y, Is.EqualTo(expectedPlateauSize.Y)));
         sizeResult.IfLeft(_ => Assert.That(false));
     }
 
@@ -81,7 +80,7 @@ internal class InputParserTests
         var parsedPosition = InputParser.ParsePosition(position);
 
         // Assert
-        parsedPosition.IfLeft(error => error.Should().Be(Messages.InvalidPosition(position)));
+        parsedPosition.IfLeft(error => Assert.That(error, Is.EqualTo(Messages.InvalidPosition(position))));
         parsedPosition.IfRight(_ => Assert.That(false));
     }
 
@@ -96,7 +95,7 @@ internal class InputParserTests
 
         // Assert
         Assert.That(position.IsLeft);
-        position.IfLeft(error => error.Should().Be(Messages.InvalidPosition(positionString)));
+        position.IfLeft(error => Assert.That(error, Is.EqualTo(Messages.InvalidPosition(positionString))));
     }
 
     [Test]

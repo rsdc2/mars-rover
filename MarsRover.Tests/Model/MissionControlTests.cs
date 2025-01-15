@@ -1,7 +1,6 @@
 ﻿using MarsRover.Data;
 using MarsRover.Model;
 using MarsRover.Types;
-using FluentAssertions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +25,7 @@ namespace MarsRover.Tests.Model
 
             // Assert
             Assert.That(updatedMissionControl.IsRight);
-            updatedMissionControl.IfRight(mc => mc.Rovers.Count.Should().Be(1));
+            updatedMissionControl.IfRight(mc => Assert.That(mc.Rovers.Count, Is.EqualTo(1)));
         }
 
         [Test, Description("Test that can add plateau successfully")]
@@ -42,7 +41,7 @@ namespace MarsRover.Tests.Model
 
             // Assert
             Assert.That(updatedMissionControl.IsRight);
-            updatedMissionControl.IfRight(mc => mc.Plateau.Should().NotBeNull());
+            updatedMissionControl.IfRight(mc => Assert.That(mc.Plateau, Is.Not.Null));
         }
 
         [Test, Description("Test that can find rover with Id")]
@@ -100,9 +99,10 @@ namespace MarsRover.Tests.Model
             var rotatedRover = missionControl.MoveRover(Rover.RoverCount);
 
             // Assert
-            rotatedRover.IsRight.Should().BeTrue();
-            rotatedRover.IfRight(rover => rover.Position.X.Should().Be(expectedX));
-            rotatedRover.IfRight(rover => rover.Position.Y.Should().Be(expectedY));
+            Assert.That(rotatedRover.IsRight, Is.True);
+
+            rotatedRover.IfRight(rover => Assert.That(rover.Position.X, Is.EqualTo(expectedX)));
+            rotatedRover.IfRight(rover => Assert.That(rover.Position.Y, Is.EqualTo(expectedY)));
         }
 
         [Test, Description("Test that returns failure if moves to an impossible location")]
@@ -130,7 +130,7 @@ namespace MarsRover.Tests.Model
             var movedRover = missionControl.MoveRover(Rover.RoverCount);
 
             // Assert
-            movedRover.IsLeft.Should().BeTrue();
+            Assert.That(movedRover.IsLeft, Is.True);
         }
 
 
@@ -158,7 +158,7 @@ namespace MarsRover.Tests.Model
 
             // Assert
             Assert.That(rotatedRover.IsRight);
-            rotatedRover.IfRight(rover => rover.Direction.Should().Be(expectedDirection));
+            rotatedRover.IfRight(rover => Assert.That(rover.Direction, Is.EqualTo(expectedDirection)));
 
         }
 

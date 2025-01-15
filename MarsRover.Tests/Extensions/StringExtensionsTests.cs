@@ -7,11 +7,10 @@ using System.Threading.Tasks;
 using LanguageExt;
 using static LanguageExt.Prelude;
 
-using FluentAssertions;
-
 using MarsRover.Extensions;
 using MarsRover.Data;
 using LanguageExt.UnsafeValueAccess;
+using NuGet.Frameworks;
 
 namespace MarsRover.Tests.Extensions
 {
@@ -25,10 +24,10 @@ namespace MarsRover.Tests.Extensions
         {
             // Act
             Either<string, int> output = input.ToInt();
+            var val = output.Value();
 
             // Assert
-            var val = output.Value();
-            val.Should().Be(expectedOutput);
+            Assert.That(val, Is.EqualTo(expectedOutput));
         }
 
         [Test]
@@ -41,7 +40,7 @@ namespace MarsRover.Tests.Extensions
             Either<string, int> output = input.ToInt();
 
             // Assert
-            output.IsLeft.Should().BeTrue();
+            Assert.That(output.IsLeft, Is.True);
         }
 
         [Test]
@@ -55,7 +54,7 @@ namespace MarsRover.Tests.Extensions
             Either<string, Direction> output = input.ToDirection();
 
             // Assert
-            output.Value().Should().Be(expectedOutput);
+            Assert.That(output, Is.EqualTo(expectedOutput));
         }
 
         [Test]
@@ -68,7 +67,7 @@ namespace MarsRover.Tests.Extensions
             Either<string, Direction> output = input.ToDirection();
 
             // Assert
-            output.IsLeft.Should().BeTrue();
+            Assert.That(output.IsLeft, Is.True);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using MarsRover.Data;
+﻿using MarsRover.Data;
 using MarsRover.Input;
 using MarsRover.Model;
 using MarsRover.Types;
@@ -33,7 +32,7 @@ namespace MarsRover.Tests.Model
 
             // Assert
             Assert.That(roverWithNewDirection.IsRight);
-            roverWithNewDirection.IfRight(rover => rover.Direction.Should().Be(finalDirection));
+            roverWithNewDirection.IfRight(rover => Assert.That(rover.Direction, Is.EqualTo(finalDirection)));
         }
 
         [Test, Description("Test that can move the rover one position forwards in the direction that it is facing")]
@@ -58,8 +57,8 @@ namespace MarsRover.Tests.Model
 
             // Assert
             Assert.That(newPosition.IsRight);
-            newPosition.IfRight(pos => pos.X.Should().Be(expectedX));
-            newPosition.IfRight(pos => pos.Y.Should().Be(expectedY));
+            newPosition.IfRight(pos => Assert.That(pos.X, Is.EqualTo(expectedX)));
+            newPosition.IfRight(pos => Assert.That(pos.Y, Is.EqualTo(expectedY)));
         }
     
 
