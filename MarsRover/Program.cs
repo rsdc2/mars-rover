@@ -7,30 +7,17 @@ using MarsRover.Input;
 using MarsRover.Model;
 using MarsRover.Data;
 using MarsRover.UI;
+using MarsRover.Extensions.LanguageExt;
 
 internal class Program
 {
     static void Happy()
     {
-        var missionControl =
-            from ps in ConsoleUI.GetPlateauSize()
-            from plateau in Plateau.FromPlateauSize(ps)
-            from mc in MissionControl.FromPlateau(plateau)
-            from pos1 in ConsoleUI.GetInitialPosition()
-            from pos2 in ConsoleUI.GetInitialPosition()
-            from mc2 in mc.AddRover(pos1)
-            from mc3 in mc.AddRover(pos2)
-            select mc3;
 
-        missionControl.IfRight(mc => Console.WriteLine(mc.Description()));
 
-        var rover11 = missionControl.Bind(mc => mc.MoveRover(1));
-        Console.WriteLine();
-        missionControl.IfRight(mc => Console.WriteLine(mc.Description()));
-
-        var rover2 = missionControl.Bind(mc => mc.RotateRover(2, RotateInstruction.L));
-        Console.WriteLine();
-        missionControl.IfRight(mc => Console.WriteLine(mc.Description()));
+        var mc__ =  from mc in ConsoleUI.GetInitialSetup()
+                    from mc_ in ConsoleUI.HandleUserInstructions(mc)
+                    select mc_;
     }
 
     static void Sad()

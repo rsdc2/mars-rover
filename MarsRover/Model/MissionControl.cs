@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MarsRover.Input;
 
 namespace MarsRover.Model
 {
@@ -45,6 +46,15 @@ namespace MarsRover.Model
             return Right(missionControl);
         }
 
+        public string Description()
+        {
+            var roversStrings = Rovers.Select(rover => rover.Description());
+            var roversString = String.Join('\n', roversStrings);
+            return $"Mission control status:\n" +
+                $"\t- Plateau size: ({Plateau.MaxX}, {Plateau.MaxY})\n" +
+                $"\t- Rovers:\n" + roversString;
+        }
+
         public Either<string, Rover> GetRoverById(int roverId) =>
             Rovers.Where(rover => rover.Id == roverId).ToList().Count switch
             {
@@ -53,11 +63,20 @@ namespace MarsRover.Model
                 _ => Left(Messages.MoreThanOneRoverWithId(roverId))
             };
 
-        public Either<string, Rover> MoveRover(int roverId)
+        public Either<string, Rover> GetFirstRover()
         {
-            return GetRoverById(roverId)
-                .Bind(MoveRover);   
+            var firstRover = Rovers.FirstOrDefault();
+            return firstRover switch
+            {
+                null => Left("Mission control is not in contact with any rovers."),
+                _ => Right(firstRover),
+            };
         }
+
+        public Either<string, Rover> MoveRover(int roverId) =>
+            GetRoverById(roverId)
+                .Bind(MoveRover);   
+
         public Either<string, Rover> MoveRover(Rover rover) {
             switch (rover.Position)
             {
@@ -91,16 +110,41 @@ namespace MarsRover.Model
             return Left(Messages.Unforeseen);
         }
         public Either<string, Rover> RotateRover(int roverId, RotateInstruction rotation)
+            => GetRoverById(roverId).Bind(rover => RotateRover(rover, rotation));
+
+        public Either<string, Rover> RotateRover(Rover rover, RotateInstruction rotation)
+            => rover.Rotate(rotation);
+
+        public Either<string, MissionControl> DoInstructions(Rover rover, Seq<Instruction> instructions)
         {
-            return GetRoverById(roverId).Bind(rover => rover.Rotate(rotation));
+            if (instructions.Count == 0) return Right(this);
+
+            var rover_ = instructions[0] switch
+            {
+                Instruction.M => from r in MoveRover(rover) 
+                                 from r_ in DoInstructions(r, instructions.Tail)
+                                 select r_,
+                Instruction.L => from r in RotateRover(rover, RotateInstruction.L) 
+                                 from r_ in DoInstructions(r, instructions.Tail) 
+                                 select r_,
+                Instruction.R => from r in RotateRover(rover, RotateInstruction.R) 
+                                 from r_ in DoInstructions(r, instructions.Tail) 
+                                 select r_,
+                _ => Left("Could not move rover")
+            };
+
+            return rover_.IsRight switch
+            {
+                true => Right(this),
+                false => Left(rover_),
+            };
+            
         }
-        public string Description()
+
+        public override string ToString()
         {
-            var roversStrings = Rovers.Select(rover => rover.Description());
-            var roversString = String.Join('\n', roversStrings);
-            return $"Mission control status:\n" +
-                $"\t- Plateau size: ({Plateau.MaxX}, {Plateau.MaxY})\n" +
-                $"\t- Rovers:\n" + roversString;
+            return this.Description();
         }
+
     }
 }

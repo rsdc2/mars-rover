@@ -13,7 +13,8 @@ internal enum Instruction
 {
     L,
     R,
-    M
+    M,
+    Q
 }
 
 
