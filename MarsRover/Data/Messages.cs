@@ -29,9 +29,13 @@ internal static class Messages
     {
         return $"Cannot get position data from string '{input}': {message}";
     }
-    public static string CannotMoveRover(int roverId)
+    public static string CannotMoveRoverOffMap(int roverId)
     {
-        return $"Cannot move Rover {roverId}";
+        return $"Cannot move Rover {roverId}: that instruction would move the rover off the map";
+    }
+    public static string CannotMoveRoverToPosition(int roverId, RoverPosition position)
+    {
+        return $"Cannot move Rover {roverId} to {position}";
     }
 
     public static string CannotParseStringToInteger(string str, string message)

@@ -15,27 +15,8 @@ internal class Program
     {
 
         var mc__ =  from mc in ConsoleUI.GetInitialSetup()
-                    from mc_ in ConsoleUI.HandleUserInstructions(mc)
+                    from mc_ in ConsoleUI.HandleUserInstructions(mc, "Start")
                     select mc_;
-    }
-
-    static void Sad()
-    {
-        string plateauSizeInput = "5 5";
-        string initialPosition1Input = "5 5 N";
-
-        var plateauSize = InputParser.ParsePlateauSize(plateauSizeInput);
-        var initialPosition1 = InputParser.ParsePosition(initialPosition1Input);
-
-        var missionControl = plateauSize
-            .Bind(Plateau.FromPlateauSize)
-            .Bind(MissionControl.FromPlateau)
-            .Bind(control => initialPosition1.Bind(pos => control.AddRover(pos)));
-
-        missionControl.IfRight(mc => Console.WriteLine(mc.Description()));
-
-        var result = missionControl.Bind(mc => mc.MoveRover(1));
-        result.IfLeft(Console.WriteLine);
     }
 
     static void Main(string[] args)

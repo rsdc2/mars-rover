@@ -15,36 +15,30 @@ namespace MarsRover.Model
         public List<Rover> Rovers { get; private set; } = [];
         public Plateau Plateau { get; private set; } = Plateau.FromInts(0, 0);
         public MissionControl() { }
-        public Either<string, MissionControl> AddPlateau(Plateau plateau)
+
+        public MissionControl(Plateau plateau)
         {
             Plateau = plateau;
-            return Right(this);
         }
+
+        public MissionControl(Plateau plateau, Rover rover)
+        {
+            Rovers = [rover];
+            Plateau = plateau;
+        }
+
+        public Either<string, MissionControl> AddPlateau(Plateau plateau) => new MissionControl(plateau);
 
         /// <summary>
         /// Adds a rover to the inventory of rovers
         /// </summary>
         /// <param name="rover">A new Rover to add</param>
         /// <returns>An Either of the updated MissionControl</returns>
-        public Either<string, MissionControl> AddRover(Rover rover)
-        {
-            Rovers.Add(rover);
-            return Right(this);
-        }
+        public Either<string, MissionControl> AddRover(Rover rover) => new MissionControl(Plateau, rover);
 
-        public Either<string, MissionControl> AddRover(RoverPosition position)
-        {
-            var rover = new Rover(position);
-            Rovers.Add(rover);
-            return Right(this);
-        }
+        public Either<string, MissionControl> AddRover(RoverPosition position) => AddRover(new Rover(position));
 
-        public static Either<string, MissionControl> FromPlateau(Plateau plateau)
-        {
-            var missionControl = new MissionControl();
-            missionControl.AddPlateau(plateau);
-            return Right(missionControl);
-        }
+        public static Either<string, MissionControl> FromPlateau(Plateau plateau) => new MissionControl(plateau);
 
         public string Description()
         {
@@ -73,72 +67,73 @@ namespace MarsRover.Model
             };
         }
 
-        public Either<string, Rover> MoveRover(int roverId) =>
-            GetRoverById(roverId)
-                .Bind(MoveRover);   
+        public static Either<string, MissionControl> MoveRover(MissionControl mc, int roverId) =>
+            from rover in mc.GetRoverById(roverId)
+            from updatedMC in MoveRover(mc, rover)
+            select updatedMC;
 
-        public Either<string, Rover> MoveRover(Rover rover) {
+        public static Either<string, MissionControl> MoveRover(MissionControl mc, Rover rover) {
             switch (rover.Position)
             {
                 case RoverPosition(_, 0, Direction.S):
-                    return Left(Messages.CannotMoveRover(rover.Id));
+                    return Left(Messages.CannotMoveRoverOffMap(rover.Id));
 
                 case RoverPosition(_, _, Direction.S):
-                    return rover.UpdateY(rover.Position.Y - 1);
+                    return rover.UpdateY(rover.Position.Y - 1).Bind(mc.UpdateRover);
 
                 case RoverPosition(0, _, Direction.W):
-                    return Left(Messages.CannotMoveRover(rover.Id));
+                    return Left(Messages.CannotMoveRoverOffMap(rover.Id));
 
                 case RoverPosition(_, _, Direction.W):
-                    return rover.UpdateX(rover.Position.X - 1);
+                    return rover.UpdateX(rover.Position.X - 1).Bind(mc.UpdateRover);
 
                 case RoverPosition(_, _, Direction.N):
-                    if (rover.Position.Y >= Plateau.MaxY)
+                    if (rover.Position.Y >= mc.Plateau.MaxY)
                     {
-                        return Left(Messages.CannotMoveRover(rover.Id));
+                        return Left(Messages.CannotMoveRoverOffMap(rover.Id));
                     }
-                    return rover.UpdateY(rover.Position.Y + 1);
+                    return rover.UpdateY(rover.Position.Y + 1).Bind(mc.UpdateRover);
 
                 case RoverPosition(_, _, Direction.E):
-                    if (rover.Position.X >= Plateau.MaxX)
+                    if (rover.Position.X >= mc.Plateau.MaxX)
                     {
-                        return Left(Messages.CannotMoveRover(rover.Id));
+                        return Left(Messages.CannotMoveRoverOffMap(rover.Id));
                     }
-                    return rover.UpdateX(rover.Position.X + 1);
+                    return rover.UpdateX(rover.Position.X + 1).Bind(mc.UpdateRover);
 
             }
             return Left(Messages.Unforeseen);
         }
-        public Either<string, Rover> RotateRover(int roverId, RotateInstruction rotation)
-            => GetRoverById(roverId).Bind(rover => RotateRover(rover, rotation));
+        public static Either<string, MissionControl> RotateRover(MissionControl mc, int roverId, RotateInstruction rotation) =>
+            from rover in mc.GetRoverById(roverId)
+            from updatedMC in MissionControl.RotateRover(mc, rover, rotation)
+            select updatedMC;
 
-        public Either<string, Rover> RotateRover(Rover rover, RotateInstruction rotation)
-            => rover.Rotate(rotation);
+        public static Either<string, MissionControl> RotateRover(MissionControl mc, Rover rover, RotateInstruction rotation) =>
+            from r in rover.Rotate(rotation)
+            from updatedMC in mc.UpdateRover(r)
+            select updatedMC;
 
-        public Either<string, MissionControl> DoInstructions(Rover rover, Seq<Instruction> instructions)
+        public static Either<string, MissionControl> DoInstructions(MissionControl mc, int roverId, Seq<Instruction> instructions)
         {
-            if (instructions.Count == 0) return Right(this);
+            if (instructions.Count == 0) return mc;
 
-            var rover_ = instructions[0] switch
+            var updatedMissionControl = instructions[0] switch
             {
                 Instruction.Q => Left(Messages.QuitMessage),
-                Instruction.M => from r in MoveRover(rover)
-                                 from r_ in DoInstructions(r, instructions.Tail)
-                                 select r_,
-                Instruction.L => from r in RotateRover(rover, RotateInstruction.L)
-                                 from r_ in DoInstructions(r, instructions.Tail)
-                                 select r_,
-                Instruction.R => from r in RotateRover(rover, RotateInstruction.R)
-                                 from r_ in DoInstructions(r, instructions.Tail)
-                                 select r_,
-                _             => Left($"Could not move Rover {rover.Id}")
+                Instruction.M => from mc_ in MoveRover(mc, roverId)
+                                 from mc__ in DoInstructions(mc_, roverId, instructions.Tail)
+                                 select mc__,
+                Instruction.L => from mc_ in RotateRover(mc, roverId, RotateInstruction.L)
+                                 from mc__ in DoInstructions(mc_, roverId, instructions.Tail)
+                                 select mc__,
+                Instruction.R => from mc_ in RotateRover(mc, roverId, RotateInstruction.R)
+                                 from mc__ in DoInstructions(mc, roverId, instructions.Tail)
+                                 select mc__,
+                _ => Left($"Could not move Rover {roverId}")
             };
 
-            return rover_.IsRight switch
-            {
-                true => Right(this),
-                false => Left(rover_),
-            };
+            return updatedMissionControl;
             
         }
 
@@ -146,6 +141,8 @@ namespace MarsRover.Model
         {
             return this.Description();
         }
+
+        public Either<string, MissionControl> UpdateRover(Rover rover) => new MissionControl(Plateau, new Rover(rover.Position, rover.Id));
 
     }
 }

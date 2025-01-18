@@ -12,6 +12,7 @@ using static LanguageExt.Prelude;
 
 using MarsRover.Model;
 using System.Reflection.Metadata.Ecma335;
+using LanguageExt.UnsafeValueAccess;
 
 namespace MarsRover.UI
 {
@@ -38,14 +39,19 @@ namespace MarsRover.UI
             return plateauSize;
         }
 
-        public static Either<string, Seq<Instruction>> GetUserInstructions()
+        public static Either<string, Seq<Instruction>> GetUserInstructions(MissionControl mc, string message)
         {
+            Console.Clear();
+            Console.WriteLine(message);
+            Console.WriteLine("Current status: \n" + mc.ToString() + "\n");
             Console.WriteLine(Messages.GetInstructions);
             string? instructionsInput = Console.ReadLine();
             var instructions = InputParser.ParseInstructions(instructionsInput);
-            instructions.ToConsole();
-            if (instructions.IsLeft) return GetUserInstructions();
-            return instructions;
+            return instructions.Match
+            (
+                Right: instructions => instructions,
+                Left: error => GetUserInstructions(mc, error)
+            );
         }
 
 
@@ -59,18 +65,36 @@ namespace MarsRover.UI
             return initialPosition;
         }
 
-        public static Either<string, MissionControl> HandleUserInstructions(MissionControl missionControl)
+        public static Either<string, MissionControl> HandleUserInstructions(MissionControl mc, string message)
         {
-            var instructions = ConsoleUI.GetUserInstructions();
+            var instructions = GetUserInstructions(mc, message);
 
-            var mc_ = from i in instructions
-                    from rover in missionControl.GetFirstRover()
-                    from mc in missionControl.DoInstructions(rover, i)
-                    select mc;
+            var updatedMc = from i in instructions
+                    from rover in mc.GetFirstRover()
+                    from mc_ in MissionControl.DoInstructions(mc, rover.Id, i)
+                    select mc_;
 
-            mc_.ToConsole();
+            updatedMc.ToConsole();
 
-            return mc_.Bind(HandleUserInstructions);
+            //return updatedMc.IsRight switch
+            //{
+            //    true => updatedMc.Bind(HandleUserInstructions),
+            //    false => (updatedMc == Messages.QuitMessage) switch
+            //    {
+            //        true => updatedMc,
+            //        false => HandleUserInstructions(mc)
+            //    }
+            //};
+
+            return updatedMc.Match
+            (
+                Right: mc => HandleUserInstructions(mc, "Instruction successful"),
+                Left: error => (updatedMc == Messages.QuitMessage) switch
+                {
+                    false => HandleUserInstructions(mc, error),
+                    true => updatedMc
+                }
+            );
         }
     }
 }

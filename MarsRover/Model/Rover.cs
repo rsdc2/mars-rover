@@ -31,6 +31,13 @@ namespace MarsRover.Model
             Id = RoverCount;
         }
 
+        public Rover(RoverPosition position, int id) : this(position)
+        {
+            Id = id;
+        }
+
+        public Rover Copy() => new Rover(this.Position, this.Id);
+
         public static Rover From(int x, int y, Direction direction) =>
             new Rover(RoverPosition.From(x, y, direction));
 
@@ -42,13 +49,13 @@ namespace MarsRover.Model
         /// <returns></returns>
         public Either<string, RoverPosition> GetNewPosition() => Position.Triple switch
         {
-            (_, 0, Direction.S) => Left(Messages.CannotMoveRover(Id)),
-            (0, _, Direction.W) => Left(Messages.CannotMoveRover(Id)),
+            (_, 0, Direction.S) => Left(Messages.CannotMoveRoverOffMap(Id)),
+            (0, _, Direction.W) => Left(Messages.CannotMoveRoverOffMap(Id)),
             (_, _, Direction.E) => Right(Position with { X = Position.X + 1 }),
             (_, _, Direction.W) => Right(Position with { X = Position.X - 1 }),
             (_, _, Direction.N) => Right(Position with { Y = Position.Y + 1 }),
             (_, _, Direction.S) => Right(Position with { Y = Position.Y - 1 }),
-            _ => Left(Messages.CannotMoveRover(Id))
+            _ => Left(Messages.CannotMoveRoverOffMap(Id))
         };
 
         
@@ -68,29 +75,25 @@ namespace MarsRover.Model
 
         }
 
-        
         public Either<string, Rover> Rotate(RotateInstruction rotation)
         {
             var directionInt = (int)Direction;
             var rotationInt = (int)rotation;
 
             var newDirection = (Direction)((4 + directionInt + rotationInt) % 4);
-            Position = Position with { Direction = newDirection };
-            return Right(this);
+            return Right(new Rover(Position with { Direction = newDirection }, this.Id));
         }
         public Either<string, Rover> UpdateX(int x)
         {
-            if (x < 0) return Left(Messages.CannotMoveRover(Id));
-            Position = Position with { X = x };
-            return Right(this);
+            if (x < 0) return Left(Messages.CannotMoveRoverOffMap(Id));
+            return Right(new Rover(Position with { X = x }, this.Id));
         }
         public Either<string, Rover> UpdateY(int y)
         {
             if (y < 0)
-                return Left(Messages.CannotMoveRover(Id));
+                return Left(Messages.CannotMoveRoverOffMap(Id));
 
-            Position = Position with { Y = y };
-            return Right(this);
+            return Right(new Rover(Position with { Y = y }, this.Id));
         }
 
         public string Description()
