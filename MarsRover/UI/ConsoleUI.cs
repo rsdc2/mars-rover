@@ -11,6 +11,7 @@ using LanguageExt;
 using static LanguageExt.Prelude;
 
 using MarsRover.Model;
+using System.Reflection.Metadata.Ecma335;
 
 namespace MarsRover.UI
 {
@@ -68,8 +69,8 @@ namespace MarsRover.UI
                     select mc;
 
             mc_.ToConsole();
-            return mc_;
-            
+
+            return mc_.Bind(HandleUserInstructions);
         }
     }
 }

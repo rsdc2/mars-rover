@@ -14,7 +14,6 @@ internal class Program
     static void Happy()
     {
 
-
         var mc__ =  from mc in ConsoleUI.GetInitialSetup()
                     from mc_ in ConsoleUI.HandleUserInstructions(mc)
                     select mc_;

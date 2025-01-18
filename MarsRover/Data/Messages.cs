@@ -23,6 +23,7 @@ internal static class Messages
     public static string NoInstruction = "No instruction given";
     public static string NoPosition = "No position given";
     public static string Unforeseen = "Unforeseen";
+    public static string QuitMessage = "Quitting...";
 
     public static string CannotGetPositionDataFromString(string input, string message)
     {

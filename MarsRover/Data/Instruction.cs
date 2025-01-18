@@ -11,10 +11,10 @@ namespace MarsRover.Data;
 
 internal enum Instruction
 {
-    L,
-    R,
-    M,
-    Q
+    L = -1,
+    M = 0,
+    R = 1,
+    Q = 3
 }
 
 

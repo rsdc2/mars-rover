@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace MarsRover.Data
 {
-    internal enum MoveInstruction
+    internal enum QuitInstruction
     {
-        M = 0
+        Q = 3
     }
 }

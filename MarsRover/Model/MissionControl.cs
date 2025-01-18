@@ -121,16 +121,17 @@ namespace MarsRover.Model
 
             var rover_ = instructions[0] switch
             {
-                Instruction.M => from r in MoveRover(rover) 
+                Instruction.Q => Left(Messages.QuitMessage),
+                Instruction.M => from r in MoveRover(rover)
                                  from r_ in DoInstructions(r, instructions.Tail)
                                  select r_,
-                Instruction.L => from r in RotateRover(rover, RotateInstruction.L) 
-                                 from r_ in DoInstructions(r, instructions.Tail) 
+                Instruction.L => from r in RotateRover(rover, RotateInstruction.L)
+                                 from r_ in DoInstructions(r, instructions.Tail)
                                  select r_,
-                Instruction.R => from r in RotateRover(rover, RotateInstruction.R) 
-                                 from r_ in DoInstructions(r, instructions.Tail) 
+                Instruction.R => from r in RotateRover(rover, RotateInstruction.R)
+                                 from r_ in DoInstructions(r, instructions.Tail)
                                  select r_,
-                _ => Left("Could not move rover")
+                _             => Left($"Could not move Rover {rover.Id}")
             };
 
             return rover_.IsRight switch
