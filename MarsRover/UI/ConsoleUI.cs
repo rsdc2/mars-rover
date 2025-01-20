@@ -1,18 +1,11 @@
 ﻿using MarsRover.Data;
 using MarsRover.Input;
 using MarsRover.Extensions.LanguageExt;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MarsRover.Model;
 
 using LanguageExt;
 using static LanguageExt.Prelude;
 
-using MarsRover.Model;
-using System.Reflection.Metadata.Ecma335;
-using LanguageExt.UnsafeValueAccess;
 
 namespace MarsRover.UI
 {
@@ -84,12 +77,11 @@ namespace MarsRover.UI
 
             return updatedMcEither.Match
             (
-                Right: newMc => from instructions in instructionsEither
-                             from roverInitial in mc.GetFirstRover()
-                             from updatedMc in updatedMcEither
+                Right: updatedMc => from instructions in instructionsEither
+                             from roverInitial in roverInitialEither
                              from roverUpdated in updatedMc.GetFirstRover()
                              let message = Messages.MoveSuccessful(roverInitial.Position, roverUpdated.Position)
-                             from finalMc in HandleUserInstructions(newMc, message + "\n\n" + newMc.Description())
+                             from finalMc in HandleUserInstructions(updatedMc, message + "\n\n" + updatedMc.Description())
                              select finalMc,
 
                 Left: error => (updatedMcEither == Messages.QuitMessage) switch
