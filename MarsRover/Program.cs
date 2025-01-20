@@ -11,16 +11,10 @@ using MarsRover.Extensions.LanguageExt;
 
 internal class Program
 {
-    static void Happy()
-    {
-
-        var mc__ =  from mc in ConsoleUI.GetInitialSetup()
-                    from mc_ in ConsoleUI.HandleUserInstructions(mc, mc.ToString())
-                    select mc_;
-    }
-
     static void Main(string[] args)
     {
-        Happy();
+        var mc__ = from mc in ConsoleUI.GetInitialSetup()
+                   from mc_ in ConsoleUI.HandleUserInstructions(mc, mc.Description())
+                   select mc_;
     }
 }

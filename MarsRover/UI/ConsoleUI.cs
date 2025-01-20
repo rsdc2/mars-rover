@@ -21,25 +21,28 @@ namespace MarsRover.UI
 
         public static Either<string, MissionControl> GetInitialSetup()
         {
-            return   from ps in GetPlateauSize()
+            return   from ps in GetPlateauSize(None)
                      from plateau in Plateau.FromPlateauSize(ps)
                      from mc in MissionControl.FromPlateau(plateau)
-                     from pos1 in GetInitialPosition()
+                     from pos1 in GetInitialPosition(ps)
                      from mc_ in mc.AddRover(pos1)
                      select mc_;
         }
 
-        public static Either<string, PlateauSize> GetPlateauSize()
+        public static Either<string, PlateauSize> GetPlateauSize(Option<string> message)
         {
+            Console.Clear();
+            message.IfSome(msg => Console.WriteLine(msg + '\n'));
             Console.WriteLine(Messages.GetPlateauSize);
             string? plateauSizeInput = Console.ReadLine();
             var plateauSize = InputParser.ParsePlateauSize(plateauSizeInput);
-            plateauSize.ToConsole();
-            if (plateauSize.IsLeft) return GetPlateauSize();
-            return plateauSize;
+            return plateauSize.Match(
+                Right: ps => ps,
+                Left: error => GetPlateauSize(error)
+            );
         }
 
-        public static Either<string, Seq<Instruction>> GetUserInstructions(MissionControl mc, string message)
+        public static Either<string, Seq<Instruction>> GetUserInstructions(MissionControl mc, Option<string> message)
         {
             Console.Clear();
             Console.WriteLine(message + '\n');
@@ -54,14 +57,15 @@ namespace MarsRover.UI
             );
         }
 
-
-        public static Either<string, RoverPosition> GetInitialPosition()
+        public static Either<string, RoverPosition> GetInitialPosition(PlateauSize plateauSize)
         {
+            Console.Clear();
+            Console.WriteLine(Messages.PlateauSize(plateauSize));
             Console.WriteLine(Messages.GetInitialPosition);
             string? initialPositionInput = Console.ReadLine();
             var initialPosition = InputParser.ParsePosition(initialPositionInput);
             initialPosition.ToConsole();
-            if (initialPosition.IsLeft) return GetInitialPosition();
+            if (initialPosition.IsLeft) return GetInitialPosition(plateauSize);
             return initialPosition;
         }
 
@@ -82,7 +86,7 @@ namespace MarsRover.UI
                              from updatedMc in updatedMcEither
                              from roverUpdated in updatedMc.GetFirstRover()
                              let message = Messages.MoveSuccessful(roverInitial.Position, roverUpdated.Position)
-                             from finalMc in HandleUserInstructions(mc, message + "\n\n" + mc.ToString())
+                             from finalMc in HandleUserInstructions(mc, message + "\n\n" + mc.Description())
                              select finalMc,
 
                 Left: error => (updatedMcEither == Messages.QuitMessage) switch

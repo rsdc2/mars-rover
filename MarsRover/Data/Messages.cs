@@ -89,6 +89,9 @@ internal static class Messages
     public static string MoveSuccessful(RoverPosition pos1, RoverPosition pos2) =>
         $"Successfully moved rover from {pos1} to {pos2}.";
 
+    public static string PlateauSize(PlateauSize plateauSize) => 
+        $"The dimensions of the plateau are {plateauSize}.";
+
     public static string RoverDoesNotExist(int id)
     {
         return $"Rover with id {id} does not exist.";
