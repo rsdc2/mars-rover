@@ -16,24 +16,24 @@ using LanguageExt.UnsafeValueAccess;
 
 namespace MarsRover.UI
 {
-    internal class ConsoleUI 
+    internal class ConsoleUI
     {
 
         public static Either<string, MissionControl> GetInitialSetup()
         {
-            return   from ps in GetPlateauSize(None)
-                     from plateau in Plateau.FromPlateauSize(ps)
-                     from mc in MissionControl.FromPlateau(plateau)
-                     from pos1 in GetInitialPosition(ps)
-                     from mc_ in mc.AddRover(pos1)
-                     select mc_;
+            return from ps in GetPlateauSize(None)
+                   from plateau in Plateau.FromPlateauSize(ps)
+                   from mc in MissionControl.FromPlateau(plateau)
+                   from pos1 in GetInitialPosition(ps, None)
+                   from mc_ in mc.AddRover(pos1)
+                   select mc_;
         }
 
         public static Either<string, PlateauSize> GetPlateauSize(Option<string> message)
         {
             Console.Clear();
             message.IfSome(msg => Console.WriteLine(msg + '\n'));
-            Console.WriteLine(Messages.GetPlateauSize);
+            Console.WriteLine(Messages.GetPlateauSize + '\n');
             string? plateauSizeInput = Console.ReadLine();
             var plateauSize = InputParser.ParsePlateauSize(plateauSizeInput);
             return plateauSize.Match(
@@ -45,8 +45,7 @@ namespace MarsRover.UI
         public static Either<string, Seq<Instruction>> GetUserInstructions(MissionControl mc, Option<string> message)
         {
             Console.Clear();
-            Console.WriteLine(message + '\n');
-
+            message.IfSome(msg => Console.WriteLine(msg + "\n"));
             Console.WriteLine(Messages.GetInstructions);
             string? instructionsInput = Console.ReadLine();
             var instructions = InputParser.ParseInstructions(instructionsInput);
@@ -57,16 +56,20 @@ namespace MarsRover.UI
             );
         }
 
-        public static Either<string, RoverPosition> GetInitialPosition(PlateauSize plateauSize)
+        public static Either<string, RoverPosition> GetInitialPosition(PlateauSize plateauSize, Option<string> message)
         {
             Console.Clear();
-            Console.WriteLine(Messages.PlateauSize(plateauSize));
-            Console.WriteLine(Messages.GetInitialPosition);
+            message.IfSome(msg => Console.WriteLine(msg + "\n"));
+            Console.WriteLine(Messages.PlateauSize(plateauSize) + '\n');
+            Console.WriteLine(Messages.GetInitialPosition + '\n');
             string? initialPositionInput = Console.ReadLine();
             var initialPosition = InputParser.ParsePosition(initialPositionInput);
             initialPosition.ToConsole();
-            if (initialPosition.IsLeft) return GetInitialPosition(plateauSize);
-            return initialPosition;
+            return initialPosition.Match
+            (
+                Right: initialPosition => initialPosition,
+                Left: error => GetInitialPosition(plateauSize, error)
+            );
         }
 
         public static Either<string, MissionControl> HandleUserInstructions(MissionControl mc, string message)
@@ -75,9 +78,9 @@ namespace MarsRover.UI
             var roverInitialEither = mc.GetFirstRover();
 
             var updatedMcEither = from instructions in instructionsEither
-                    from rover in roverInitialEither
-                    from updatedMc in MissionControl.DoInstructions(mc, rover.Id, instructions)
-                    select updatedMc;
+                                  from rover in roverInitialEither
+                                  from updatedMc in MissionControl.DoInstructions(mc, rover.Id, instructions)
+                                  select updatedMc;
 
             return updatedMcEither.Match
             (
