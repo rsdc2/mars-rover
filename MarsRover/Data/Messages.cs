@@ -12,7 +12,7 @@ internal static class Messages
 {
     public static string GetPlateauSize = "Please enter plateau dimensions, e.g. '5 5':";
     public static string GetInitialPosition = "Please enter an initial position and a facing direction, e.g. '5 5 N':";
-    public static string GetInstructions = "Please enter an instruction:";
+    public static string GetInstructions = "Please enter an instruction (M = Move, R = Rotate right, L = Rotate left, Q = Quit):";
 
 
     public static string CannotAddPlateau = "Cannot add plateau.";
@@ -86,8 +86,8 @@ internal static class Messages
         return $"More than one rover with {id} exists.";
     }
 
-    public static string MoveSuccessful(RoverPosition pos1, RoverPosition pos2) =>
-        $"Successfully moved rover from {pos1} to {pos2}.";
+    public static string MoveSuccessful(int roverId, RoverPosition pos1, RoverPosition pos2) =>
+        $"Rover {roverId} successfully changed orientation / location from {pos1} to {pos2}.";
 
     public static string PlateauSize(PlateauSize plateauSize) => 
         $"The dimensions of the plateau are {plateauSize}.";

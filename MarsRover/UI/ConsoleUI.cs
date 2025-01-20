@@ -77,10 +77,10 @@ namespace MarsRover.UI
 
             return updatedMcEither.Match
             (
-                Right: updatedMc => from instructions in instructionsEither
+                Right: updatedMc => 
                              from roverInitial in roverInitialEither
                              from roverUpdated in updatedMc.GetFirstRover()
-                             let message = Messages.MoveSuccessful(roverInitial.Position, roverUpdated.Position)
+                             let message = Messages.MoveSuccessful(roverUpdated.Id, roverInitial.Position, roverUpdated.Position)
                              from finalMc in HandleUserInstructions(updatedMc, message + "\n\n" + updatedMc.Description())
                              select finalMc,
 

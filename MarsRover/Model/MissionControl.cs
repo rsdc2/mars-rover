@@ -41,7 +41,6 @@ namespace MarsRover.Model
 
         public MissionControl DeepCopy() => new MissionControl(this.Plateau, this.Rovers[0].Copy());
 
-
         public static Either<string, MissionControl> FromPlateau(Plateau plateau) => new MissionControl(plateau);
 
         public string Description()
@@ -50,7 +49,7 @@ namespace MarsRover.Model
             var roversString = String.Join('\n', roversStrings);
             return $"Mission control status:\n" +
                 $"\t- Plateau size: ({Plateau.MaxX}, {Plateau.MaxY})\n" +
-                $"\t- Rovers:\n" + roversString;
+                $"\t- {roversString}";
         }
 
         public Either<string, Rover> GetRoverById(int roverId) =>
@@ -151,12 +150,9 @@ namespace MarsRover.Model
             return updatedMissionControl;
         }
 
-        public override string ToString()
-        {
-            return this.Description();
-        }
+        public override string ToString() => Description();
 
-        public Either<string, MissionControl> UpdateRover(Rover rover) => new MissionControl(Plateau, new Rover(rover.Position, rover.Id));
-
+        public Either<string, MissionControl> UpdateRover(Rover rover) => 
+            new MissionControl(Plateau, new Rover(rover.Position, rover.Id));
     }
 }

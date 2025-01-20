@@ -98,7 +98,7 @@ namespace MarsRover.Model
 
         public string Description()
         {
-            return $"\t\t- Rover {Id} at ({Position.X}, {Position.Y}) " +
+            return $"Rover {Id} at ({Position.X}, {Position.Y}) " +
                 $"facing {Position.Direction}";
 
         }
