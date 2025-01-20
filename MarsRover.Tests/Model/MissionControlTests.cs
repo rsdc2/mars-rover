@@ -49,12 +49,12 @@ namespace MarsRover.Tests.Model
         {
             // Arrange 
             var position = new RoverPosition(1, 1, Direction.W);
-            var rover = new Rover(position);
-            var missionControl = new MissionControl();
-            missionControl.AddRover(rover);
+            var rover = new Rover(position, 1);
+            var plateau = Plateau.FromInts(5, 5);
+            var missionControl = new MissionControl(plateau, rover);
 
             // Act
-            var foundRover = missionControl.GetRoverById(Rover.RoverCount);
+            var foundRover = missionControl.GetRoverById(1);
 
             // Assert
             Assert.That(foundRover.IsRight);
@@ -91,18 +91,20 @@ namespace MarsRover.Tests.Model
             // Arrange 
             var rover = Rover.From(1, 1, initialDirection);
             var plateau = Plateau.FromInts(5, 5);
-            var missionControl = new MissionControl();
-            missionControl.AddPlateau(plateau);
-            missionControl.AddRover(rover);
+            var missionControl = new MissionControl(plateau, rover);
 
             // Act
-            var rotatedRover = missionControl.MoveRover(Rover.RoverCount);
+            var updatedMc = missionControl.MoveRover(Rover.RoverCount);
 
             // Assert
-            Assert.That(rotatedRover.IsRight, Is.True);
+            Assert.That(updatedMc.IsRight);
 
-            rotatedRover.IfRight(rover => Assert.That(rover.Position.X, Is.EqualTo(expectedX)));
-            rotatedRover.IfRight(rover => Assert.That(rover.Position.Y, Is.EqualTo(expectedY)));
+            var updatedRover = from mc in updatedMc
+                        from r in mc.GetRoverById(1)
+                        select r;
+
+            updatedRover.IfRight(rover => Assert.That(rover.Position.X, Is.EqualTo(expectedX)));
+            updatedRover.IfRight(rover => Assert.That(rover.Position.Y, Is.EqualTo(expectedY)));
         }
 
         [Test, Description("Test that returns failure if moves to an impossible location")]
@@ -149,16 +151,21 @@ namespace MarsRover.Tests.Model
         )
         {
             // Arrange 
-            var rover = Rover.From(1, 1, initialDirection);
-            var missionControl = new MissionControl();
-            missionControl.AddRover(rover);
+            var rover = new Rover(new RoverPosition(1, 1, initialDirection), 1);
+            var plateau = new Plateau(PlateauSize.From(5, 5));
+            var missionControl = new MissionControl(plateau, rover);
 
             // Act
-            var rotatedRover = missionControl.RotateRover(Rover.RoverCount, rotation);
+            var updatedMc = missionControl.RotateRover(1, rotation);
 
             // Assert
-            Assert.That(rotatedRover.IsRight);
-            rotatedRover.IfRight(rover => Assert.That(rover.Direction, Is.EqualTo(expectedDirection)));
+            Assert.That(updatedMc.IsRight);
+
+            var actualDirection = from mc in updatedMc
+                             from r in mc.GetRoverById(1)
+                             let direction = r.Direction 
+                             select direction;
+            actualDirection.IfRight(dir => Assert.That(dir, Is.EqualTo(expectedDirection)));
 
         }
 

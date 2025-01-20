@@ -71,6 +71,9 @@ namespace MarsRover.Model
             };
         }
 
+        public Either<string, MissionControl> MoveRover(int roverId) => 
+            MoveRover(this, roverId);
+
         public static Either<string, MissionControl> MoveRover(MissionControl mc, int roverId) =>
             from rover in mc.GetRoverById(roverId)
             from updatedMc in MoveRover(mc, rover)
@@ -107,6 +110,10 @@ namespace MarsRover.Model
             }
             return Left(Messages.Unforeseen);
         }
+
+        public Either<string, MissionControl> RotateRover(int roverId, RotateInstruction rotation) =>
+            RotateRover(this, roverId, rotation);
+
         public static Either<string, MissionControl> RotateRover(MissionControl mc, int roverId, RotateInstruction rotation) =>
             from rover in mc.GetRoverById(roverId)
             from updatedMc in RotateRover(mc, rover, rotation)

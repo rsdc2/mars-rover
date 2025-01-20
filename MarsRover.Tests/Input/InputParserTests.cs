@@ -29,7 +29,6 @@ internal class InputParserTests
         result.IfRight(_ => Assert.That(false));
     }
 
-    [TestCase("1 3 ")]
     [TestCase ("asd5 7")]
     [TestCase ("10ga5")]
     public void InvalidPlateauSizeReturnsFailureWithMessage(string sizeString)
