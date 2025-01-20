@@ -33,7 +33,7 @@ namespace MarsRover.UI
         {
             Console.Clear();
             message.IfSome(msg => Console.WriteLine(msg + '\n'));
-            Console.WriteLine(Messages.GetPlateauSize + '\n');
+            Console.WriteLine(Messages.GetPlateauSize);
             string? plateauSizeInput = Console.ReadLine();
             var plateauSize = InputParser.ParsePlateauSize(plateauSizeInput);
             return plateauSize.Match(
@@ -52,7 +52,7 @@ namespace MarsRover.UI
             return instructions.Match
             (
                 Right: instructions => instructions,
-                Left: error => GetUserInstructions(mc, error)
+                Left: error => GetUserInstructions(mc, error + " Rover not moved.\n\n" + mc.Description())
             );
         }
 
@@ -61,7 +61,7 @@ namespace MarsRover.UI
             Console.Clear();
             message.IfSome(msg => Console.WriteLine(msg + "\n"));
             Console.WriteLine(Messages.PlateauSize(plateauSize) + '\n');
-            Console.WriteLine(Messages.GetInitialPosition + '\n');
+            Console.WriteLine(Messages.GetInitialPosition);
             string? initialPositionInput = Console.ReadLine();
             var initialPosition = InputParser.ParsePosition(initialPositionInput);
             initialPosition.ToConsole();
@@ -84,12 +84,12 @@ namespace MarsRover.UI
 
             return updatedMcEither.Match
             (
-                Right: mc => from instructions in instructionsEither
-                             from roverInitial in roverInitialEither
+                Right: newMc => from instructions in instructionsEither
+                             from roverInitial in mc.GetFirstRover()
                              from updatedMc in updatedMcEither
                              from roverUpdated in updatedMc.GetFirstRover()
                              let message = Messages.MoveSuccessful(roverInitial.Position, roverUpdated.Position)
-                             from finalMc in HandleUserInstructions(mc, message + "\n\n" + mc.Description())
+                             from finalMc in HandleUserInstructions(newMc, message + "\n\n" + newMc.Description())
                              select finalMc,
 
                 Left: error => (updatedMcEither == Messages.QuitMessage) switch

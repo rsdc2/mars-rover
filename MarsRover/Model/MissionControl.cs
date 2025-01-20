@@ -39,10 +39,8 @@ namespace MarsRover.Model
 
         public Either<string, MissionControl> AddRover(RoverPosition position) => AddRover(new Rover(position));
 
-        public MissionControl DeepCopy()
-        {
-            return new MissionControl(this.Plateau, this.Rovers[0].Copy());
-        }
+        public MissionControl DeepCopy() => new MissionControl(this.Plateau, this.Rovers[0].Copy());
+
 
         public static Either<string, MissionControl> FromPlateau(Plateau plateau) => new MissionControl(plateau);
 

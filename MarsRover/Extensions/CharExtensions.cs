@@ -20,7 +20,7 @@ internal static class CharExtensions
         'R' => Right(Instruction.R),
         'L' => Right(Instruction.L),
         'Q' => Right(Instruction.Q),
-        _ => Left($"{c} {Messages.ParseFailure}")
+        _ => Left($"'{c}' {Messages.ParseFailure}")
     };
 
     [Pure]
