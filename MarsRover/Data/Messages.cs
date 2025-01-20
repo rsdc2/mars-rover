@@ -31,60 +31,67 @@ internal static class Messages
     }
     public static string CannotMoveRoverOffMap(int roverId)
     {
-        return $"Cannot move Rover {roverId}: that instruction would move the rover off the map";
+        return $"Cannot move Rover {roverId}: that instruction would move the rover off the map.";
     }
     public static string CannotMoveRoverToPosition(int roverId, RoverPosition position)
     {
-        return $"Cannot move Rover {roverId} to {position}";
+        return $"Cannot move Rover {roverId} to {position}.";
+    }
+    public static string CannotMoveRoverToPositionOffMap(int roverId, RoverPosition position)
+    {
+        return $"Cannot move Rover {roverId} to {position}. This would move the rover off the map.";
     }
 
     public static string CannotParseStringToInteger(string str, string message)
     {
-        return $"Cannot parse string '{str}' to integer: {message}";
+        return $"Cannot parse string '{str}' to integer: {message}.";
     }
 
     public static string CannotRotateRover(Rover rover)
     {
-        return $"Cannot rotate Rover {rover.Id}";
+        return $"Cannot rotate Rover {rover.Id}.";
     }
 
     public static string CannotRotateRover(int roverId)
     {
-        return $"Cannot rotate Rover {roverId}";
+        return $"Cannot rotate Rover {roverId}.";
     }
 
     public static string InvalidDirection(char direction)
     {
-        return $"Direction {direction} is not valid";
+        return $"Direction {direction} is not valid.";
     }
     public static string InvalidDirection(string direction)
     {
-        return $"Direction {direction} is not valid";
+        return $"Direction {direction} is not valid.";
     }
 
     public static string InvalidCoordinate(char coordinate)
     {
-        return $"{coordinate} is not a valid coordinate";
+        return $"{coordinate} is not a valid coordinate.";
     }
 
     public static string InvalidDimensions(string dimensions)
     {
-        return $"{dimensions} are not valid dimensions for the plateau";
+        return $"{dimensions} are not valid dimensions for the plateau.";
     }
 
     public static string InvalidPosition(string position)
     {
-        return $"Position {position} is not valid";
+        return $"Position {position} is not valid.";
     }
 
     public static string MoreThanOneRoverWithId(int id)
     {
-        return $"More than one rover with {id} exists";
+        return $"More than one rover with {id} exists.";
     }
+
+    public static string MoveSuccessful(RoverPosition pos1, RoverPosition pos2) =>
+        $"Successfully moved rover from {pos1} to {pos2}.";
 
     public static string RoverDoesNotExist(int id)
     {
-        return $"Rover with id {id} does not exist";
+        return $"Rover with id {id} does not exist.";
     }
 
 

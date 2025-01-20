@@ -24,5 +24,7 @@ namespace MarsRover.Data
             var (x, y, direction) = triple;
             return new RoverPosition(x, y, direction);
         }
+
+        public override string ToString() => $"({X}, {Y}, {Direction})";
     };
 }

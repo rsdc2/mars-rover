@@ -42,8 +42,8 @@ namespace MarsRover.UI
         public static Either<string, Seq<Instruction>> GetUserInstructions(MissionControl mc, string message)
         {
             Console.Clear();
-            Console.WriteLine(message);
-            Console.WriteLine("Current status: \n" + mc.ToString() + "\n");
+            Console.WriteLine(message + '\n');
+
             Console.WriteLine(Messages.GetInstructions);
             string? instructionsInput = Console.ReadLine();
             var instructions = InputParser.ParseInstructions(instructionsInput);
@@ -67,32 +67,28 @@ namespace MarsRover.UI
 
         public static Either<string, MissionControl> HandleUserInstructions(MissionControl mc, string message)
         {
-            var instructions = GetUserInstructions(mc, message);
+            var instructionsEither = GetUserInstructions(mc, message);
+            var roverInitialEither = mc.GetFirstRover();
 
-            var updatedMc = from i in instructions
-                    from rover in mc.GetFirstRover()
-                    from mc_ in MissionControl.DoInstructions(mc, rover.Id, i)
-                    select mc_;
+            var updatedMcEither = from instructions in instructionsEither
+                    from rover in roverInitialEither
+                    from updatedMc in MissionControl.DoInstructions(mc, rover.Id, instructions)
+                    select updatedMc;
 
-            updatedMc.ToConsole();
-
-            //return updatedMc.IsRight switch
-            //{
-            //    true => updatedMc.Bind(HandleUserInstructions),
-            //    false => (updatedMc == Messages.QuitMessage) switch
-            //    {
-            //        true => updatedMc,
-            //        false => HandleUserInstructions(mc)
-            //    }
-            //};
-
-            return updatedMc.Match
+            return updatedMcEither.Match
             (
-                Right: mc => HandleUserInstructions(mc, "Instruction successful"),
-                Left: error => (updatedMc == Messages.QuitMessage) switch
+                Right: mc => from instructions in instructionsEither
+                             from roverInitial in roverInitialEither
+                             from updatedMc in updatedMcEither
+                             from roverUpdated in updatedMc.GetFirstRover()
+                             let message = Messages.MoveSuccessful(roverInitial.Position, roverUpdated.Position)
+                             from finalMc in HandleUserInstructions(mc, message + "\n\n" + mc.ToString())
+                             select finalMc,
+
+                Left: error => (updatedMcEither == Messages.QuitMessage) switch
                 {
-                    false => HandleUserInstructions(mc, error),
-                    true => updatedMc
+                    false => HandleUserInstructions(mc, error + "\n\n" + mc.ToString()),
+                    true => updatedMcEither
                 }
             );
         }

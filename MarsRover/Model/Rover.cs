@@ -31,12 +31,12 @@ namespace MarsRover.Model
             Id = RoverCount;
         }
 
-        public Rover(RoverPosition position, int id) : this(position)
+        public Rover(RoverPosition position, int id) : this(position) 
         {
             Id = id;
         }
 
-        public Rover Copy() => new Rover(this.Position, this.Id);
+        public Rover Copy() => new Rover(new RoverPosition(X, Y, Direction), this.Id);
 
         public static Rover From(int x, int y, Direction direction) =>
             new Rover(RoverPosition.From(x, y, direction));
@@ -66,11 +66,12 @@ namespace MarsRover.Model
         public Either<string, Rover> Move()
         {
             var newPosition = GetNewPosition();
-            newPosition.IfRight(position => Position = position);
+            newPosition.IfRight(position => Position = new RoverPosition(X, Y, Direction));
 
-            return newPosition.Match<Either<string, Rover>>(
+            return newPosition.Match(
                 Left: error => Left(error),
-                Right: _ => Right(this)
+                Right: _ => from pos in newPosition
+                            select new Rover(pos)
             );
 
         }
@@ -90,8 +91,7 @@ namespace MarsRover.Model
         }
         public Either<string, Rover> UpdateY(int y)
         {
-            if (y < 0)
-                return Left(Messages.CannotMoveRoverOffMap(Id));
+            if (y < 0) return Left(Messages.CannotMoveRoverOffMap(Id));
 
             return Right(new Rover(Position with { Y = y }, this.Id));
         }

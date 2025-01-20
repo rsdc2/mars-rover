@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MarsRover.Input;
+using System.Runtime.CompilerServices;
 
 namespace MarsRover.Model
 {
@@ -23,7 +24,7 @@ namespace MarsRover.Model
 
         public MissionControl(Plateau plateau, Rover rover)
         {
-            Rovers = [rover];
+            Rovers = new List<Rover> { rover };
             Plateau = plateau;
         }
 
@@ -37,6 +38,11 @@ namespace MarsRover.Model
         public Either<string, MissionControl> AddRover(Rover rover) => new MissionControl(Plateau, rover);
 
         public Either<string, MissionControl> AddRover(RoverPosition position) => AddRover(new Rover(position));
+
+        public MissionControl DeepCopy()
+        {
+            return new MissionControl(this.Plateau, this.Rovers[0].Copy());
+        }
 
         public static Either<string, MissionControl> FromPlateau(Plateau plateau) => new MissionControl(plateau);
 
@@ -69,20 +75,20 @@ namespace MarsRover.Model
 
         public static Either<string, MissionControl> MoveRover(MissionControl mc, int roverId) =>
             from rover in mc.GetRoverById(roverId)
-            from updatedMC in MoveRover(mc, rover)
-            select updatedMC;
+            from updatedMc in MoveRover(mc, rover)
+            select updatedMc;
 
         public static Either<string, MissionControl> MoveRover(MissionControl mc, Rover rover) {
             switch (rover.Position)
             {
                 case RoverPosition(_, 0, Direction.S):
-                    return Left(Messages.CannotMoveRoverOffMap(rover.Id));
+                    return Left(Messages.CannotMoveRoverToPositionOffMap(rover.Id, rover.Position with { Y = -1 }));
 
                 case RoverPosition(_, _, Direction.S):
                     return rover.UpdateY(rover.Position.Y - 1).Bind(mc.UpdateRover);
 
                 case RoverPosition(0, _, Direction.W):
-                    return Left(Messages.CannotMoveRoverOffMap(rover.Id));
+                    return Left(Messages.CannotMoveRoverToPositionOffMap(rover.Id, rover.Position with { X = -1 }));
 
                 case RoverPosition(_, _, Direction.W):
                     return rover.UpdateX(rover.Position.X - 1).Bind(mc.UpdateRover);
@@ -90,29 +96,33 @@ namespace MarsRover.Model
                 case RoverPosition(_, _, Direction.N):
                     if (rover.Position.Y >= mc.Plateau.MaxY)
                     {
-                        return Left(Messages.CannotMoveRoverOffMap(rover.Id));
+                        return Left(Messages.CannotMoveRoverToPositionOffMap(rover.Id, rover.Position with { Y = rover.Position.Y + 1}));
                     }
                     return rover.UpdateY(rover.Position.Y + 1).Bind(mc.UpdateRover);
 
                 case RoverPosition(_, _, Direction.E):
                     if (rover.Position.X >= mc.Plateau.MaxX)
                     {
-                        return Left(Messages.CannotMoveRoverOffMap(rover.Id));
+                        return Left(Messages.CannotMoveRoverToPositionOffMap(rover.Id, rover.Position with { Y = rover.Position.X + 1 }));
                     }
                     return rover.UpdateX(rover.Position.X + 1).Bind(mc.UpdateRover);
-
             }
             return Left(Messages.Unforeseen);
         }
         public static Either<string, MissionControl> RotateRover(MissionControl mc, int roverId, RotateInstruction rotation) =>
             from rover in mc.GetRoverById(roverId)
-            from updatedMC in MissionControl.RotateRover(mc, rover, rotation)
-            select updatedMC;
+            from updatedMc in RotateRover(mc, rover, rotation)
+            select updatedMc;
 
         public static Either<string, MissionControl> RotateRover(MissionControl mc, Rover rover, RotateInstruction rotation) =>
             from r in rover.Rotate(rotation)
-            from updatedMC in mc.UpdateRover(r)
-            select updatedMC;
+            from updatedMc in mc.UpdateRover(r)
+            select updatedMc;
+
+        public Either<string, MissionControl> DoInstructions(int roverId, Seq<Instruction> instructions)
+        {
+            return DoInstructions(this, roverId, instructions);
+        }
 
         public static Either<string, MissionControl> DoInstructions(MissionControl mc, int roverId, Seq<Instruction> instructions)
         {
@@ -121,20 +131,19 @@ namespace MarsRover.Model
             var updatedMissionControl = instructions[0] switch
             {
                 Instruction.Q => Left(Messages.QuitMessage),
-                Instruction.M => from mc_ in MoveRover(mc, roverId)
-                                 from mc__ in DoInstructions(mc_, roverId, instructions.Tail)
-                                 select mc__,
-                Instruction.L => from mc_ in RotateRover(mc, roverId, RotateInstruction.L)
-                                 from mc__ in DoInstructions(mc_, roverId, instructions.Tail)
-                                 select mc__,
-                Instruction.R => from mc_ in RotateRover(mc, roverId, RotateInstruction.R)
-                                 from mc__ in DoInstructions(mc, roverId, instructions.Tail)
-                                 select mc__,
+                Instruction.M => from updatedMc in MoveRover(mc, roverId)
+                                 from finalMc in DoInstructions(updatedMc, roverId, instructions.Tail)
+                                 select finalMc,
+                Instruction.L => from updatedMc in RotateRover(mc, roverId, RotateInstruction.L)
+                                 from finalMc in DoInstructions(updatedMc, roverId, instructions.Tail)
+                                 select finalMc,
+                Instruction.R => from updatedMc in RotateRover(mc, roverId, RotateInstruction.R)
+                                 from finalMc in DoInstructions(updatedMc, roverId, instructions.Tail)
+                                 select finalMc,
                 _ => Left($"Could not move Rover {roverId}")
             };
 
             return updatedMissionControl;
-            
         }
 
         public override string ToString()
