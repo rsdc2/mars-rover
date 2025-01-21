@@ -71,6 +71,7 @@ public static Either<string, MissionControl> GetInitialSetup()
 }
 ```
 
+
 As [Paul Louth shows](https://paullouth.com/higher-kinds-in-csharp-with-language-ext-part-7-monads/), this structure parallels `do` notation in Haskell. The equivalent function in Haskell might be written like this:
 
 ```Haskell
@@ -82,9 +83,13 @@ GetInitialSetup = do
     position <- GetInitialPosition PlateauSize Nothing
     updatedMissionControl <- AddRover missionControl position
     pure updatedMissionControl
-
 ```
 
+From this the similarity of the structure of the two is readily apparent:
+| C#            | Haskell   |
+|---------------|------------
+| `from x in y` | x <- y    |
+| `select x`    | pure x    |
 
 
 ## Acknowledgements
