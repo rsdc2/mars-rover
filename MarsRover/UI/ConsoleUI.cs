@@ -14,12 +14,12 @@ namespace MarsRover.UI
 
         public static Either<string, MissionControl> GetInitialSetup()
         {
-            return from ps in GetPlateauSize(None)
-                   from plateau in Plateau.FromPlateauSize(ps)
-                   from mc in MissionControl.FromPlateau(plateau)
-                   from pos1 in GetInitialPosition(ps, None)
-                   from mc_ in mc.AddRover(pos1)
-                   select mc_;
+            return from plateauSize in GetPlateauSize(None)
+                   from plateau in Plateau.FromPlateauSize(plateauSize)
+                   from missionControl in MissionControl.FromPlateau(plateau)
+                   from position in GetInitialPosition(plateauSize, None)
+                   from updatedMissionControl in missionControl.AddRover(position)
+                   select updatedMissionControl;
         }
 
         public static Either<string, PlateauSize> GetPlateauSize(Option<string> message)
