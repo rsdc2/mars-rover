@@ -1,11 +1,6 @@
 ﻿using MarsRover.Data;
 using LanguageExt;
 using static LanguageExt.Prelude; 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Diagnostics.Contracts;
 
@@ -16,20 +11,20 @@ internal static class CharExtensions
     [Pure]
     internal static Either<string, Instruction> ToInstruction(this char c) => c switch
     {
-        'M' => Right(Instruction.M),
-        'R' => Right(Instruction.R),
-        'L' => Right(Instruction.L),
-        'Q' => Right(Instruction.Q),
+        'M' or 'm' => Right(Instruction.M),
+        'R' or 'r' => Right(Instruction.R),
+        'L' or 'l' => Right(Instruction.L),
+        'Q' or 'q' => Right(Instruction.Q),
         _ => Left($"'{c}' {Messages.ParseFailure}")
     };
 
     [Pure]
     internal static Either<string, Direction> ToDirection(this char c) => c switch
     {
-        'N' => Right(Direction.N),
-        'E' => Right(Direction.E),
-        'S' => Right(Direction.S),
-        'W' => Right(Direction.W),
+        'N' or 'n' => Right(Direction.N),
+        'E' or 'e' => Right(Direction.E),
+        'S' or 's' => Right(Direction.S),
+        'W' or 'w' => Right(Direction.W),
         _ => Left($"{c} {Messages.InvalidDirection(c)}")
     };
 

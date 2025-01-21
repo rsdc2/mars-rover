@@ -27,7 +27,7 @@ internal static class Messages
 
     public static string CannotGetPositionDataFromString(string input, string message)
     {
-        return $"Cannot get position data from string '{input}': {message}";
+        return $"Cannot get position data from string '{input}'.";
     }
     public static string CannotMoveRoverOffMap(int roverId)
     {
@@ -78,7 +78,7 @@ internal static class Messages
 
     public static string InvalidPosition(string position)
     {
-        return $"Position {position} is not valid.";
+        return $"({position}) is not a valid position.";
     }
 
     public static string MoreThanOneRoverWithId(int id)

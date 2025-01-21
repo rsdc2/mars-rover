@@ -17,13 +17,13 @@ namespace MarsRover.Input;
 internal static partial class InputParser
 {
 
-    [GeneratedRegex(@"[LRM]+")]
+    [GeneratedRegex(@"[LRMQlrmq]+")]
     private static partial Regex InstructionRegex();
 
     [GeneratedRegex(@"^([0-9]+?) ([0-9]+)$")]
     private static partial Regex PlateauSizeRegex();
 
-    [GeneratedRegex(@"^([0-9]+?) ([0-9]+?) ([NESW])$")]
+    [GeneratedRegex(@"^([0-9]+?) ([0-9]+?) ([NESWnesw])$")]
     private static partial Regex PositionRegex();
 
     private static Either<string, (string, string)> GetPlateauSizeDataFromString(string plateauSize)
