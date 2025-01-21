@@ -1,13 +1,5 @@
-﻿using System.Runtime.CompilerServices;
-
-[assembly: InternalsVisibleTo("MarsRover.Tests")]
-
-namespace MarsRover;
-using MarsRover.Input;
-using MarsRover.Model;
-using MarsRover.Data;
+﻿namespace MarsRover;
 using MarsRover.UI;
-using MarsRover.Extensions.LanguageExt;
 
 internal class Program
 {
