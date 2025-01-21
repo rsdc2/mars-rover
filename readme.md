@@ -49,6 +49,44 @@ cd MarsRover.Tests
 dotnet test
 ```
 
+## Implementation according to the functional programming paradigm
+
+I've used a pure functional approach to structuring the app. This means _inter alia_ using:
+
+- Value types instead of reference types. For example, the `MissionControl` class never changes state when the rover changes position. Instead, a new `MissionControl` class is created with a new rover each time there is a change.
+- Recursion instead of loops.
+- Monadic types from the excellent [LanguageExt](https://github.com/louthy/language-ext) library, especially `Option` and `Either`. The use of the latter means that it is never necessary to `throw` and `catch` exceptions. Instead, functions that may not succeed return an `Either<string, T>`, where `T` is the return type of the corresponding non-monadic function. If the function succeeds, `T` is returned wrapped in the `Either` monad. If it fails, a `string` carrying the error message is returned, also wrapped in the `Either`. (For an introduction to the practice and advantages of functional programming in C#, see [Paul's Louth's blog](https://paullouth.com/). On monads in particular, see [his introduction](https://paullouth.com/higher-kinds-in-csharp-with-language-ext-part-7-monads/).)
+
+One of the great benefits of wrapping return values in monadic types, like `Either`, is that it is possible to use LINQ query expressions with them. Consider the following code from the `ConsoleUI` of the `MarsRover` project:
+
+```C#
+public static Either<string, MissionControl> GetInitialSetup()
+{
+    return  from plateauSize in GetPlateauSize(None)
+            from plateau in Plateau.FromPlateauSize(plateauSize)
+            from missionControl in MissionControl.FromPlateau(plateau)
+            from position in GetInitialPosition(plateauSize, None)
+            from updatedMissionControl in missionControl.AddRover(position)
+            select updatedMissionControl;
+}
+```
+
+As [Paul Louth shows](https://paullouth.com/higher-kinds-in-csharp-with-language-ext-part-7-monads/), this structure parallels `do` notation in Haskell. The equivalent function in Haskell might be written like this:
+
+```Haskell
+GetInitialSetup :: Either String MissionControl
+GetInitialSetup = do
+    plateauSize <- GetPlateauSize Nothing
+    plateau <- Plateau.FromPlateauSize plateauSize
+    missionControl <- MissionControl.FromPlateau plateau
+    position <- GetInitialPosition PlateauSize Nothing
+    updatedMissionControl <- AddRover missionControl position
+    pure updatedMissionControl
+
+```
+
+
+
 ## Acknowledgements
 
 ### Context
